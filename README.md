@@ -35,7 +35,7 @@ A correct output misunderstood is still a failure. This is what separates cognit
 2020–Now   The AI Engineer → Instructional integrity applied to AI interfaces
 ```
 
-25 years of education and instructional design work proved that the learning environment is a safety system. This is not a new idea — it is the continuation of the arc.
+35 years of education and instructional design work proved that the learning environment is a safety system. This is not a new idea — it is the continuation of the arc.
 
 ## What Is Real Now
 
