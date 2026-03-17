@@ -1,0 +1,167 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id             String   @id @default(cuid())
+  email          String   @unique
+  name           String?
+  role           Role     @default(REVIEWER)
+  organizationId String?
+
+  organization Organization? @relation(fields: [organizationId], references: [id])
+  artifacts    Artifact[]
+  runs         EvaluationRun[]
+  templates    Template[]   @relation("TemplateCreatedBy")
+  playbooks    Playbook[]   @relation("PlaybookCreatedBy")
+  trainingSessions TrainingSession[] @relation("TrainingSessionCreatedBy")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Organization {
+  id   String @id @default(cuid())
+  name String
+
+  users            User[]
+  trainingSessions TrainingSession[]
+}
+
+model Artifact {
+  id        String   @id @default(cuid())
+  ownerId   String
+  title     String?
+  rawText   String
+  sourceType ArtifactSourceType
+  mimeType  String?
+
+  owner    User             @relation(fields: [ownerId], references: [id])
+  runs     EvaluationRun[]
+  examples TrainingExample[]
+
+  createdAt DateTime @default(now())
+}
+
+model EvaluationRun {
+  id            String             @id @default(cuid())
+  artifactId    String
+  userId        String
+  rubricVersion String
+  status        EvaluationStatus   @default(PENDING)
+  overallGrade  Grade
+
+  artifact Artifact          @relation(fields: [artifactId], references: [id])
+  user     User              @relation(fields: [userId], references: [id])
+  criteria CriterionResult[]
+  examples TrainingExample[]
+
+  createdAt   DateTime @default(now())
+  completedAt DateTime?
+}
+
+model CriterionResult {
+  id              String   @id @default(cuid())
+  evaluationRunId String
+  invariantId     String
+  criterionName   String
+  grade           Grade
+  rationale       String
+  nextAction      String
+
+  run EvaluationRun @relation(fields: [evaluationRunId], references: [id])
+}
+
+model Template {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  invariantId String?
+  content     String
+
+  createdById String
+  createdBy   User   @relation("TemplateCreatedBy", fields: [createdById], references: [id])
+
+  steps PlaybookStep[]
+
+  createdAt DateTime @default(now())
+}
+
+model Playbook {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+
+  createdById String
+  createdBy   User   @relation("PlaybookCreatedBy", fields: [createdById], references: [id])
+
+  steps PlaybookStep[]
+
+  createdAt DateTime @default(now())
+}
+
+model PlaybookStep {
+  id         String   @id @default(cuid())
+  order      Int
+  label      String
+  templateId String?
+  playbookId String
+
+  template Template? @relation(fields: [templateId], references: [id])
+  playbook Playbook @relation(fields: [playbookId], references: [id])
+}
+
+model TrainingSession {
+  id             String   @id @default(cuid())
+  organizationId String?
+  createdById    String
+  label          String?
+
+  organization Organization? @relation(fields: [organizationId], references: [id])
+  createdBy    User          @relation("TrainingSessionCreatedBy", fields: [createdById], references: [id])
+  examples     TrainingExample[]
+
+  createdAt DateTime @default(now())
+}
+
+model TrainingExample {
+  id              String   @id @default(cuid())
+  trainingSessionId String
+  artifactId      String
+  evaluationRunId String
+  revisionText    String
+
+  session  TrainingSession @relation(fields: [trainingSessionId], references: [id])
+  artifact Artifact        @relation(fields: [artifactId], references: [id])
+  run      EvaluationRun   @relation(fields: [evaluationRunId], references: [id])
+
+  createdAt DateTime @default(now())
+}
+
+enum Role {
+  ADMIN
+  REVIEWER
+  AUTHOR
+}
+
+enum ArtifactSourceType {
+  PASTE
+  UPLOAD
+}
+
+enum EvaluationStatus {
+  PENDING
+  COMPLETED
+  FAILED
+}
+
+enum Grade {
+  PASS
+  WARN
+  FAIL
+}
+

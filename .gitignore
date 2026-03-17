@@ -1,0 +1,7 @@
+.next/
+node_modules/
+.env
+.env.local
+
+# OpenMemory - IDE/Assistant specific rules
+.cursor/rules/openmemory.mdc
