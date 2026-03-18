@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useTransition } from "react";
 import type { EvaluationRunResult, CriterionResult } from "@/lib/evaluator";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
