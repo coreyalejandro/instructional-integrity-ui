@@ -10,11 +10,12 @@ export function Hero() {
           Five-invariant operating layer
         </div>
         <h1 className="max-w-4xl text-4xl font-semibold leading-tight md:text-6xl">
-          Build trustable instruction systems for people and AI without losing the original intent.
+          Instructional Integrity Studio — cognitive safety for explanations, not just correct sentences.
         </h1>
         <p className="mt-5 max-w-3xl text-base leading-7 text-zinc-300 md:text-lg">
-          This UI is designed around the ideal journey: understand the framework, run a focused evaluation,
-          then move directly into templates, playbooks, and AI training workflows with no context loss.
+          Surfaces <strong className="font-semibold text-zinc-100">scaffolding failures</strong> that create false understanding: premature conclusions,
+          missing prerequisites, terminology jumps, compression overload, and polished but unsafe explanations. Evaluations are evidence-backed and
+          session-scoped for Safety Evaluators (TLC Article VI).
         </p>
         <div className="mt-8 flex flex-wrap gap-3">
           <Link

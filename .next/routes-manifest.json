@@ -22,12 +22,20 @@
   },
   "dynamicRoutes": [
     {
-      "page": "/api/evaluator/runs/[id]",
-      "regex": "^/api/evaluator/runs/([^/]+?)(?:/)?$",
+      "page": "/api/evaluations/[id]",
+      "regex": "^/api/evaluations/([^/]+?)(?:/)?$",
       "routeKeys": {
         "nxtPid": "nxtPid"
       },
-      "namedRegex": "^/api/evaluator/runs/(?<nxtPid>[^/]+?)(?:/)?$"
+      "namedRegex": "^/api/evaluations/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/api/evaluations/[id]/export",
+      "regex": "^/api/evaluations/([^/]+?)/export(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/api/evaluations/(?<nxtPid>[^/]+?)/export(?:/)?$"
     },
     {
       "page": "/runs/[id]",
@@ -58,16 +66,22 @@
       "namedRegex": "^/_not\\-found(?:/)?$"
     },
     {
-      "page": "/api/evaluator/run",
-      "regex": "^/api/evaluator/run(?:/)?$",
+      "page": "/api/evaluations",
+      "regex": "^/api/evaluations(?:/)?$",
       "routeKeys": {},
-      "namedRegex": "^/api/evaluator/run(?:/)?$"
+      "namedRegex": "^/api/evaluations(?:/)?$"
     },
     {
-      "page": "/api/evaluator/runs",
-      "regex": "^/api/evaluator/runs(?:/)?$",
+      "page": "/api/samples",
+      "regex": "^/api/samples(?:/)?$",
       "routeKeys": {},
-      "namedRegex": "^/api/evaluator/runs(?:/)?$"
+      "namedRegex": "^/api/samples(?:/)?$"
+    },
+    {
+      "page": "/api/uploads",
+      "regex": "^/api/uploads(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/uploads(?:/)?$"
     },
     {
       "page": "/evaluate",

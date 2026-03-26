@@ -1,15 +1,17 @@
-# Instructional Integrity UI — project index
+# Instructional Integrity Studio — project index
 
 ## Overview
 
-Next.js App Router product for **instructional / cognitive safety** evaluation: rubric-based scoring, persisted runs, and evidence-first UI.
+**Instructional Integrity Studio** (repo slug `instructional-integrity-ui`) is a **Cognitive Safety** product: deterministic, rubric-backed evaluation of text/markdown instructional artifacts with evidence excerpts, failure classes, remediation, session-scoped Postgres persistence, and JSON/Markdown export.
+
+**Canonical build contract:** `docs/prompts/ZERO_SHOT_BUILD_CONTRACT__INSTRUCTIONAL_INTEGRITY_STUDIO.md` (ZSB-IIS-v2.0).
 
 ## Architecture
 
-- **UI:** `app/` routes — marketing home (`/`), workspace evaluate (`/evaluate`), run history (`/runs`, `/runs/[id]`).
-- **API:** `POST /api/evaluator/run`, `GET /api/evaluator/runs`, `GET /api/evaluator/runs/[id]`.
-- **Logic:** `lib/evaluator.ts` (computation + persistence), `lib/rubric.ts`, `lib/demo-user.ts` (demo workspace user until auth).
-- **Data:** PostgreSQL via Prisma (`prisma/schema.prisma`). Local dev: `docker compose up -d` + `DATABASE_URL` on port **5434**.
+- **UI:** `app/page.tsx` (doctrine), `app/evaluate/page.tsx`, `app/runs/page.tsx`, `app/runs/[id]/page.tsx`; `components/header.tsx` nav Home / Evaluate / History.
+- **API:** `app/api/evaluations/*`, `app/api/uploads`, `app/api/samples`.
+- **Core:** `lib/evaluator/ruleBasedTextEvaluator.ts`, `lib/rubric/defaultRubric.ts` (10 dimensions), `lib/persistence/*`, `lib/session/session.ts` (cookie `iis_session`).
+- **Data:** PostgreSQL + Prisma; local `docker compose` port **5434**.
 
 ## User defined namespaces
 
@@ -17,9 +19,11 @@ Next.js App Router product for **instructional / cognitive safety** evaluation: 
 
 ## Components
 
-- `AppShell`, `Header` (nav), `EvaluatorPanel` (client), `EvaluateCta`, journey/package/workflow sections.
+- Evaluator workspace: `components/evaluator-panel.tsx`, glossary, upload, samples.
+- Verdict UI: `components/verdict-badge.tsx`, evidence/failure/remediation panels.
 
 ## Patterns
 
-- Demo identity: `ensureDemoUser()` upserts `demo@instructional-integrity.local` before persisted evaluations.
-- Build: `prisma generate` in `postinstall` and before `next build`.
+- Anonymous **session** cookie; all runs filtered by `sessionId` — no accounts in MVP.
+- **Evaluator** interface in `lib/evaluator/evaluatorInterface.ts`; MVP = `rule-based-text-evaluator`.
+- **Truth ledger:** `docs/truth-status.md`.

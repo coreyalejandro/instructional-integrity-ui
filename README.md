@@ -1,154 +1,114 @@
-# Instructional Integrity UI
+# Instructional Integrity Studio — Cognitive Safety
 
-## What This Is
+## Zero-Shot Build Contract (canonical)
 
-Cognitive safety system that evaluates whether learning environments produce correct understanding — not just correct content. Instructional Integrity UI provides a journey-map flow from framework comprehension through artifact evaluation to production packaging, with a rubric system that makes evidence states visible at every stage.
+This repository implements **ZSB-IIS-v2.0**. The canonical build-governing artifact is:
 
-## What Safety Problem It Addresses
+**[`docs/prompts/ZERO_SHOT_BUILD_CONTRACT__INSTRUCTIONAL_INTEGRITY_STUDIO.md`](docs/prompts/ZERO_SHOT_BUILD_CONTRACT__INSTRUCTIONAL_INTEGRITY_STUDIO.md)**
 
-**Domain:** Cognitive Safety
-**Failure class:** A learning environment produces false understanding, misleading structure, or unsafe mental models — even when the underlying content is technically correct.
+All product behavior aligns with that contract where specified; where silent, TLC Articles I–VIII apply.
 
-An AI tutoring system presents a correct mathematical proof but shows the conclusion before the premises. The student concludes the conclusion was an assumption. The content was correct. The understanding is wrong. This is not a pedagogical failure — it is a safety failure. Cognitive scaffolding determines whether correct information produces correct mental models. Without evaluation of instructional integrity, systems produce confident learners with false understanding.
+---
 
-## Why It Matters
+## 1. Product name and domain
 
-> Alignment includes human interpretation, not just model outputs.
+**Instructional Integrity Studio** — a **Cognitive Safety evaluation system** for instructional artifacts (text/markdown MVP).
 
-A correct output misunderstood is still a failure. This is what separates cognitive safety from epistemic safety: the truth may be present but the interpretation may be wrong. Every AI system that teaches, explains, or presents information for decision-making is an instructional system — and every instructional system that produces false understanding is a cognitive safety hazard.
+## 2. What cognitive safety is
 
-## How It Fits the Platform / Domain
+**Cognitive safety** asks whether an explanation tends to produce **correct understanding** in the learner — not only whether its propositions are true. Epistemic correctness without scaffolding can still produce false mental models.
 
-**Domain:** Cognitive Safety
-**Platform role:** Domain work under Safety Systems Design
-**Invariants enforced:** I1 (Evidence-First — evaluations require evidence), I3 (Confidence-Verification — rubric scores must be grounded), I5 (Safety Over Fluency — reject polished content with bad scaffolding)
+## 3. What problem this solves
 
-### Connection to Doctrine
+Correct content can be **cognitively unsafe** when sequencing, prerequisites, terminology, or compression cause the learner to infer the wrong structure. This system surfaces **scaffolding failures** with **evidence-backed** rubric results and failure classes.
 
-**Doctrine Point 4:** *Alignment includes human interpretation, not just model outputs.* Instructional Integrity UI exists because a system can produce entirely truthful, well-formatted, accessible content that still produces false understanding in the learner. The scaffolding is the safety layer.
+## 4. Who it is for
 
-### Connection to 35-Year Arc
+**Primary user class:** **Safety Evaluator** — submits artifacts, runs evaluations, inspects criterion evidence, failure classes, remediation, history, and exports (Article VI).
 
-```
-1991–2010  The Educator    → Cognitive safety as daily practice
-2010–2020  The Dean        → Learning environments as safety systems
-2020–Now   The AI Engineer → Instructional integrity applied to AI interfaces
-```
+**Secondary (non-interactive in MVP):** Protected End User — copy is written so reports could be shown without harm.
 
-35 years of education and instructional design work proved that the learning environment is a safety system. This is not a new idea — it is the continuation of the arc.
+**Tertiary:** Constitutional Operator — reviews `docs/truth-status.md`, README, and doctrine surfaces.
 
-## What Is Real Now
+## 5. How it fits in TLC
 
-- **App shell + navigation** — Overview (`/`), Evaluate (`/evaluate`), History (`/runs`, `/runs/[id]`)
-- **Persisted evaluations** — `POST /api/evaluator/run` creates `Artifact`, `EvaluationRun`, and `CriterionResult` rows via Prisma
-- **Journey-map flow** — 5-step product journey on the marketing home surface
-- **Evaluator workspace** — client panel with optional title, live API run, link to saved run detail (`components/evaluator-panel.tsx`)
-- **Rubric system** — structured evaluation criteria (`lib/rubric.ts`)
-- **Evaluator logic** — deterministic scoring engine (`lib/evaluator.ts`) with DB persistence (`runEvaluationPersisted`)
-- **Domain types** — typed domain model (`lib/domain.ts`)
-- **Data layer** — `lib/data.ts`, `lib/db.ts`, `lib/runs.ts`, `lib/demo-user.ts` (demo workspace user until auth)
-- **API** — run, list runs, fetch run by id under `/api/evaluator/*`
-- **Prisma + PostgreSQL** — schema with migrations; local DB via `docker-compose.yml` (default host port **5434**)
-- **Components** — app-shell, evaluate-cta, evaluator-panel, footer, header, hero, journey-map, package-grid, ui/, workflow-overview
-- **Tests** — evaluator unit tests (`lib/evaluator.test.ts`, `vitest.config.mts`)
+Cognitive Safety subsystem under **The Living Constitution (TLC)** on **SentinelOS**. See [`docs/tlc-mapping.md`](docs/tlc-mapping.md).
 
-**Implementation status:** MVP product loop (evaluate → persist → history → detail). Auth, uploads, and external LLM analysis are not implemented.
-
-## How to Verify
+## 6. Getting started (under 5 minutes)
 
 ```bash
 git clone <repo-url>
 cd instructional-integrity-ui
-
-cp .env.example .env
+cp .env.example .env.local
+docker compose up -d
 npm install
-npm run db:up
-npm run db:migrate
-npm run db:seed
-
+npm run db:reset
 npm run dev
-# → http://localhost:3000 — open /evaluate, run a check, then /runs
+# → http://localhost:3000/evaluate — run a paste or pick a sample, then open History
+```
 
+Database listens on **localhost:5434** by default (see `docker-compose.yml`).
+
+## 7. Current truthful status
+
+**[`docs/truth-status.md`](docs/truth-status.md)** — owner, dates, verified claims, deferred features.
+
+## 8. Implemented features (§17 snapshot)
+
+| # | Feature | Status |
+|---|---------|--------|
+| 1 | Paste text/markdown | implemented |
+| 2 | Upload `.txt` / `.md` | implemented |
+| 3 | Sample artifacts | implemented |
+| 4 | Normalize artifact | implemented |
+| 5 | §6.1 validation (server) | implemented |
+| 6 | Deterministic rubric run | implemented |
+| 7 | Ten dimension scores | implemented |
+| 8 | Evidence excerpts | implemented |
+| 9 | Failure classes | implemented |
+| 10 | Remediation strings | implemented |
+| 11 | Persist runs (Postgres) | implemented |
+| 12 | Run history | implemented |
+| 13 | Run detail | implemented |
+| 14 | Delete run + audit log | implemented |
+| 15 | JSON export | implemented |
+| 16 | Markdown export | implemented |
+| 17 | Error schema + UI errors | partial |
+
+## 9. Not implemented / deferred (§18)
+
+PDF/slides/OCR/multimodal, LLM evaluators, full auth, org workspaces, production SLAs, validated accuracy studies — see `docs/truth-status.md`.
+
+## 10. Install / run / test
+
+```bash
+npm install
+docker compose up -d
+npm run db:reset
+npm run dev
 npm test
 npm run build
+npm run test:e2e   # requires dev server; see playwright.config.ts
 ```
 
-## Demo / Evidence
+## 11. Environment
 
-- **Working UI:** `http://localhost:3000` — complete homepage with journey-map flow
-- **Evaluator interface:** `components/evaluator-panel.tsx` — visible evidence states
-- **Rubric system:** `lib/rubric.ts` — structured evaluation criteria
-- **Evaluator logic:** `lib/evaluator.ts` — core evaluation engine
-- **Data model:** `prisma/schema.prisma` — 7 models defining the evaluation domain
-- **Test suite:** `lib/evaluator.test.ts` — evaluator tests
+See [`.env.example`](.env.example) for `DATABASE_URL`, `LOG_LEVEL`, limits, and timeouts.
 
-## Status Matrix
+## 12. Architectural map
 
-| Component | Status | Evidence |
-|-----------|--------|---------|
-| Homepage UI | Implemented | `app/page.tsx`, 8 components |
-| Journey-map flow | Implemented | `components/journey-map.tsx` |
-| Evaluator interface (mock) | Implemented | `components/evaluator-panel.tsx` |
-| Rubric system | Implemented | `lib/rubric.ts` |
-| Evaluator logic | Implemented | `lib/evaluator.ts` |
-| Domain types | Implemented | `lib/domain.ts`, `lib/api-types.ts` |
-| Prisma schema | Implemented | `prisma/schema.prisma` — 7 models |
-| Evaluator test suite | Implemented | `lib/evaluator.test.ts` |
-| Real evaluator execution | Not wired | Mock only — no live artifact evaluation |
-| Authentication | Not implemented | No auth system |
-| Persistent state | Not implemented | Prisma schema exists, no database provisioned |
-| File upload pipeline | Not implemented | No upload capability |
-| Training workflow backend | Not implemented | No backend processing |
+See [`docs/architecture.md`](docs/architecture.md) and contract §13 / §15.
 
-## Next Planned Work
+## 13. Repository slug
 
-- Wire real evaluator execution against live instructional artifacts
-- Provision PostgreSQL and run Prisma migrations
-- Implement authentication (likely NextAuth)
-- Build file upload pipeline for artifact submission
-- Connect rubric scoring to persistent evaluation records
-- Add evidence export for audit trail
+NPM package name may remain `instructional-integrity-ui`; product surfaces use **Instructional Integrity Studio**.
 
 ---
 
-### V&T Statement
+### Staleness warning
 
-**EXISTS:** Homepage UI, journey-map flow, evaluator interface (mock), rubric system, evaluator logic, domain types, Prisma schema, evaluator tests, Vitest config
-**VERIFIED AGAINST:** Application source code, component files, library files, Prisma schema, test files
-**NOT CLAIMED:** Real evaluator execution, authentication, persistent state, production deployment, validated evaluation accuracy
-**STATUS:** PROTOTYPE
+If [`docs/truth-status.md`](docs/truth-status.md) is older than its freshness window, treat README feature claims as suspect until the status file is refreshed.
 
 ---
 
-### Repository Structure
-
-```
-app/                    # Next.js 14 App Router
-  page.tsx              # Homepage
-  layout.tsx            # Root layout
-  api/                  # API routes
-components/             # 8 React components
-  evaluator-panel.tsx   # Evaluator interface with evidence states
-  journey-map.tsx       # 5-step product journey
-  hero.tsx              # Homepage hero
-  package-grid.tsx      # Package overview
-  workflow-overview.tsx # Workflow visualization
-  header.tsx            # Navigation
-  footer.tsx            # Footer
-  ui/                   # Shared UI primitives
-lib/                    # Core logic
-  evaluator.ts          # Evaluation engine
-  rubric.ts             # Rubric system
-  domain.ts             # Domain types
-  data.ts               # Data access
-  db.ts                 # Database utilities
-  api-types.ts          # API contracts
-  evaluator.test.ts     # Tests
-prisma/
-  schema.prisma         # Data model (7 models)
-```
-
----
-
-*Part of [Safety Systems Design](https://github.com/coreyalejandro) — Cognitive Safety domain*
-*Platform: SentinelOS — AI Safety Operating Layer*
+**Repository:** instructional-integrity-ui · **Product:** Instructional Integrity Studio · **Contract:** ZSB-IIS-v2.0

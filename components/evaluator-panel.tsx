@@ -1,196 +1,279 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useTransition } from "react";
-import type { EvaluationRunResult, CriterionResult } from "@/lib/evaluator";
+import { useEffect, useState, useTransition } from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { CognitiveSafetyGlossary } from "@/components/cognitive-safety-glossary";
+import { ErrorDisplay } from "@/components/error-display";
+import { EvidencePanel } from "@/components/evidence-panel";
+import { FailureClassList } from "@/components/failure-class-list";
+import { SampleArtifactSelector, type SampleOption } from "@/components/sample-artifact-selector";
+import { UploadDropzone } from "@/components/upload-dropzone";
+import { VerdictBadge } from "@/components/verdict-badge";
+import type { VerdictLabel } from "@/lib/domain/verdictTypes";
 
-function gradeClass(grade: string) {
-  if (grade === "PASS") return "bg-emerald-500/15 text-emerald-300 border-emerald-500/30";
-  if (grade === "WARN") return "bg-amber-500/15 text-amber-300 border-amber-500/30";
-  return "bg-red-500/15 text-red-300 border-red-500/30";
+export interface ApiEvaluationResponse {
+  id: string;
+  status: "complete" | "incomplete";
+  verdict: VerdictLabel;
+  overallScore: number;
+  criterionResults: Array<{
+    dimensionId: string;
+    score: number;
+    maxScore: number;
+    verdict: "pass" | "warn" | "fail";
+    evidence: Array<{ excerptText: string; location: string; relevance: string }>;
+    failureClasses: string[];
+    remediation: string;
+  }>;
+  failureClassSummary: string[];
+  createdAt: string;
+  artifactTitle: string;
 }
 
-const initialArtifact = `Purpose: Review this onboarding guide for instructional integrity.
+const DEMO_ARTIFACT = `Purpose: Try a quick evaluation without writing content.
 
 Assumptions:
-- Reader has access to the product dashboard.
+- Reader can follow numbered steps.
 
 Steps:
-1. Open Settings.
-2. Configure role access.
-3. Save changes.
+1. Open the evaluation workspace.
+2. Paste text or choose a sample.
+3. Run evaluation and open the saved run for evidence.
 
-One section is too dense and needs revision.`;
+This walkthrough uses clear sequencing and named assumptions.`;
 
-async function runEvaluatorRequest(artifactText: string, artifactTitle?: string): Promise<EvaluationRunResult> {
-  const response = await fetch("/api/evaluator/run", {
+async function postEvaluation(body: unknown): Promise<ApiEvaluationResponse> {
+  const response = await fetch("/api/evaluations", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({ artifactText, artifactTitle })
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body)
   });
-
+  const data = await response.json().catch(() => ({}));
   if (!response.ok) {
-    const data = await response.json().catch(() => ({}));
-    const message = typeof data.error === "string" ? data.error : "Unexpected error while running evaluator.";
-    throw new Error(message);
+    const msg =
+      data?.error?.message && data?.error?.recoveryGuidance
+        ? `${data.error.message} — ${data.error.recoveryGuidance}`
+        : typeof data?.error === "string"
+          ? data.error
+          : "Evaluation request failed.";
+    throw new Error(msg);
   }
-
-  return (await response.json()) as EvaluationRunResult;
+  return data as ApiEvaluationResponse;
 }
 
 export function EvaluatorPanel() {
-  const [artifact, setArtifact] = useState(initialArtifact);
-  const [artifactTitle, setArtifactTitle] = useState("");
-  const [result, setResult] = useState<EvaluationRunResult | null>(null);
+  const [artifact, setArtifact] = useState(DEMO_ARTIFACT);
+  const [artifactTitle, setArtifactTitle] = useState("Getting started — workspace tour");
+  const [samples, setSamples] = useState<SampleOption[]>([]);
+  const [sampleSlug, setSampleSlug] = useState("");
+  const [result, setResult] = useState<ApiEvaluationResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
-  const criteria: CriterionResult[] =
-    result?.criteria ??
-    ([
-      {
-        id: "intent_preserved",
-        criterion: "Intent Preserved",
-        grade: "PASS",
-        rationale: "The artifact states the objective early and does not drift into unrelated goals.",
-        nextAction: "Keep the objective statement, but consider adding a concrete outcome at the top."
-      },
-      {
-        id: "assumptions_visible",
-        criterion: "Assumptions Visible",
-        grade: "WARN",
-        rationale: "The artifact assumes prior knowledge of the deployment environment but does not name it.",
-        nextAction: "Add a short section that names what the learner is expected to already know or have done."
-      },
-      {
-        id: "sequencing_stable",
-        criterion: "Sequencing Stable",
-        grade: "PASS",
-        rationale: "The steps are ordered clearly and no dependent actions are collapsed.",
-        nextAction: "Review the steps and ensure each action depends only on information already established."
-      },
-      {
-        id: "language_accessible",
-        criterion: "Language Accessible",
-        grade: "PASS",
-        rationale: "The wording is concrete and avoids dense jargon.",
-        nextAction: "Swap any dense phrases for concrete verbs and examples that match your audience."
-      },
-      {
-        id: "neurodivergent_safe",
-        criterion: "Neurodivergent Safe",
-        grade: "WARN",
-        rationale: "One section contains a paragraph that should be split into smaller task units.",
-        nextAction: "Split long paragraphs into smaller task units with clear headings or bullet points."
-      }
-    ] satisfies CriterionResult[]);
+  useEffect(() => {
+    fetch("/api/samples")
+      .then((r) => r.json())
+      .then((rows: SampleOption[]) => {
+        setSamples(rows);
+        if (rows[0]) setSampleSlug(rows[0].slug);
+      })
+      .catch(() => {
+        /* samples optional for first paint */
+      });
+  }, []);
 
-  const handleRunEvaluator = () => {
+  const runEvaluation = (payload: unknown) => {
+    setError(null);
+    startTransition(() => {
+      postEvaluation(payload)
+        .then((data) => {
+          setResult(data);
+        })
+        .catch((err: unknown) => {
+          setError(err instanceof Error ? err.message : "Failed to run evaluation.");
+        });
+    });
+  };
+
+  const handleRunPaste = () => {
     const trimmed = artifact.trim();
     if (!trimmed) {
       setError("Add or paste an instructional artifact first.");
       return;
     }
-
-    setError(null);
-    startTransition(() => {
-      runEvaluatorRequest(trimmed, artifactTitle.trim() || undefined)
-        .then((data) => {
-          setResult(data);
-        })
-        .catch((err: unknown) => {
-          const message = err instanceof Error ? err.message : "Failed to run evaluator.";
-          setError(message);
-        });
+    runEvaluation({
+      artifact: {
+        source: "paste",
+        title: artifactTitle.trim().slice(0, 200) || "Pasted artifact",
+        content: trimmed
+      }
     });
   };
 
+  const handleRunSample = () => {
+    if (!sampleSlug) {
+      setError("Choose a sample artifact.");
+      return;
+    }
+    runEvaluation({
+      artifact: {
+        source: "sample",
+        title: samples.find((s) => s.slug === sampleSlug)?.title ?? "Sample",
+        sampleId: sampleSlug
+      }
+    });
+  };
+
+  const handleUpload = async (file: File) => {
+    setError(null);
+    const fd = new FormData();
+    fd.append("file", file);
+    try {
+      const res = await fetch("/api/uploads", { method: "POST", body: fd });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        const msg =
+          data?.error?.message && data?.error?.recoveryGuidance
+            ? `${data.error.message} — ${data.error.recoveryGuidance}`
+            : "Upload failed.";
+        throw new Error(msg);
+      }
+      runEvaluation({
+        artifact: {
+          source: "upload",
+          title: (data.title as string) || file.name,
+          uploadId: data.uploadId as string
+        }
+      });
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Upload failed.");
+    }
+  };
+
   return (
-    <section className="grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
-      <Card>
-        <CardHeader
-          title="Focused task surface"
-          subtitle="The default screen should help the user complete one meaningful action immediately."
-        />
-        <CardContent>
-          <div className="space-y-4">
-            <div>
-              <label htmlFor="artifact-title" className="mb-1.5 block text-xs font-medium text-zinc-400">
-                Title (optional)
-              </label>
-              <input
-                id="artifact-title"
-                type="text"
-                value={artifactTitle}
-                onChange={(event) => setArtifactTitle(event.target.value)}
-                placeholder="e.g. Q2 onboarding checklist"
-                className="w-full rounded-2xl border border-border bg-zinc-950 px-4 py-2.5 text-sm text-zinc-200 outline-none placeholder:text-zinc-600"
-              />
-            </div>
-            <div>
-              <label htmlFor="artifact-body" className="mb-1.5 block text-xs font-medium text-zinc-400">
-                Instructional artifact
-              </label>
-              <textarea
-                id="artifact-body"
-                value={artifact}
-                onChange={(event) => setArtifact(event.target.value)}
-                className="h-72 w-full rounded-3xl border border-border bg-zinc-950 p-4 text-sm leading-6 text-zinc-200 outline-none"
-              />
-            </div>
-            <div className="grid gap-3 sm:grid-cols-2">
-              <button
-                type="button"
-                onClick={handleRunEvaluator}
-                className="rounded-2xl bg-white px-4 py-3 text-sm font-medium text-black disabled:cursor-not-allowed disabled:opacity-60"
-                disabled={isPending}
-              >
-                {isPending ? "Running evaluator…" : "Run evaluator"}
-              </button>
-              {result ? (
-                <Link
-                  href={`/runs/${result.run.id}`}
-                  className="inline-flex items-center justify-center rounded-2xl border border-border bg-zinc-950 px-4 py-3 text-center text-sm font-medium text-white transition hover:bg-zinc-900"
+    <section className="grid gap-4 lg:grid-cols-[0.95fr_1.05fr]" aria-label="Evaluator workspace">
+      <div className="space-y-4">
+        <Card>
+          <CardHeader
+            title="Evaluate an artifact"
+            subtitle="Audience: Safety Evaluator — paste text, upload a file, or run a seeded sample (Article VI)."
+          />
+          <CardContent>
+            <div className="space-y-4">
+              <div>
+                <label htmlFor="artifact-title" className="text-sm font-medium text-zinc-200">
+                  Title (optional)
+                </label>
+                <input
+                  id="artifact-title"
+                  className="mt-1 w-full rounded-xl border border-border bg-zinc-950 px-3 py-2 text-sm text-zinc-100"
+                  value={artifactTitle}
+                  onChange={(e) => setArtifactTitle(e.target.value)}
+                  maxLength={200}
+                />
+              </div>
+              <div>
+                <label htmlFor="artifact-body" className="text-sm font-medium text-zinc-200">
+                  Instructional artifact
+                </label>
+                <textarea
+                  id="artifact-body"
+                  className="mt-1 min-h-[220px] w-full rounded-xl border border-border bg-zinc-950 px-3 py-2 font-mono text-sm text-zinc-100"
+                  value={artifact}
+                  onChange={(e) => setArtifact(e.target.value)}
+                />
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-zinc-950 disabled:opacity-50"
+                  disabled={isPending}
+                  onClick={handleRunPaste}
                 >
-                  Open saved run
-                </Link>
-              ) : (
-                <span className="inline-flex items-center justify-center rounded-2xl border border-dashed border-zinc-700 bg-zinc-950/50 px-4 py-3 text-center text-sm text-zinc-500">
-                  Saved run link appears after you evaluate
-                </span>
-              )}
-              {error ? <p className="col-span-2 text-xs text-red-400">{error}</p> : null}
+                  Run evaluation (paste)
+                </button>
+              </div>
             </div>
-          </div>
-        </CardContent>
-      </Card>
-      <Card>
-        <CardHeader
-          title="Evidence-first feedback"
-          subtitle="Results should name the criterion, show the status, and explain the exact next move."
-        />
-        <CardContent>
-          <div className="space-y-3">
-            {criteria.map((item) => (
-              <div key={item.id} className="rounded-3xl border border-border bg-black/30 p-4">
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                  <div>
-                    <p className="font-medium">{item.criterion}</p>
-                    <p className="mt-1 text-xs text-zinc-400">{item.nextAction}</p>
-                  </div>
-                  <span className={`rounded-full border px-3 py-1 text-xs font-semibold ${gradeClass(item.grade)}`}>
-                    {item.grade}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader title="Sample library" subtitle="Preloaded artifacts for immediate runs (§8.2)." />
+          <CardContent className="space-y-4">
+            <SampleArtifactSelector
+              samples={samples}
+              value={sampleSlug}
+              onChange={setSampleSlug}
+              disabled={isPending}
+            />
+            <button
+              type="button"
+              className="rounded-full border border-border px-4 py-2 text-sm font-semibold text-zinc-100 disabled:opacity-50"
+              disabled={isPending || !sampleSlug}
+              onClick={handleRunSample}
+            >
+              Run evaluation (sample)
+            </button>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader title="Upload" subtitle="UTF-8 .txt / .md only; validated server-side." />
+          <CardContent>
+            <UploadDropzone onFile={handleUpload} disabled={isPending} />
+          </CardContent>
+        </Card>
+
+        <CognitiveSafetyGlossary />
+      </div>
+
+      <div className="space-y-4">
+        {error ? <ErrorDisplay message={error} recovery="Fix the issue above, then retry the evaluation." /> : null}
+
+        <Card>
+          <CardHeader title="Latest result" subtitle="Inspectable structure — no black-box summary (§19)." />
+          <CardContent>
+            {result ? (
+              <div className="space-y-4">
+                <div className="flex flex-wrap items-center gap-3">
+                  <VerdictBadge verdict={result.verdict} />
+                  <span className="text-sm text-zinc-400">
+                    Score {result.overallScore.toFixed(1)} · {result.status}
                   </span>
                 </div>
-                <p className="mt-3 text-sm leading-6 text-zinc-300">{item.rationale}</p>
+                <p className="text-sm text-zinc-300">
+                  <span className="font-medium text-zinc-100">{result.artifactTitle}</span> — criterion-level evidence
+                  appears on the run detail page.
+                </p>
+                <Link
+                  href={`/runs/${result.id}`}
+                  className="inline-flex rounded-full border border-border px-4 py-2 text-sm font-semibold text-white"
+                >
+                  Open run detail
+                </Link>
+                <div className="space-y-2">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Failure classes (summary)</p>
+                  <FailureClassList classIds={result.failureClassSummary} />
+                </div>
+                <div className="space-y-2">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">First criterion preview</p>
+                  {result.criterionResults[0] ? (
+                    <div className="rounded-xl border border-border bg-black/30 p-3 text-sm">
+                      <p className="font-mono text-xs text-zinc-400">{result.criterionResults[0].dimensionId}</p>
+                      <EvidencePanel items={result.criterionResults[0].evidence} />
+                    </div>
+                  ) : null}
+                </div>
               </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+            ) : (
+              <p className="text-sm text-zinc-400">
+                Run an evaluation to see verdict, failure classes, and a preview of evidence-backed criteria.
+              </p>
+            )}
+          </CardContent>
+        </Card>
+      </div>
     </section>
   );
 }

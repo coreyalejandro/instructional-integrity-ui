@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ShieldCheck, Sparkles } from "lucide-react";
 
 const nav = [
-  { href: "/", label: "Overview" },
+  { href: "/", label: "Home" },
   { href: "/evaluate", label: "Evaluate" },
   { href: "/runs", label: "History" }
 ] as const;

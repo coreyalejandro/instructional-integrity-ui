@@ -14,9 +14,14 @@ export default defineConfig({
   },
   test: {
     environment: "node",
-    include: ["**/*.test.{ts,tsx}"],
+    include: ["lib/**/*.test.{ts,tsx}", "tests/**/*.test.{ts,tsx}"],
     coverage: {
-      enabled: false
+      enabled: true,
+      provider: "v8",
+      include: ["lib/**/*.ts"],
+      thresholds: {
+        lines: 40
+      }
     }
   }
 });

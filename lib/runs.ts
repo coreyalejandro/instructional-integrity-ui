@@ -1,25 +1,16 @@
-import { prisma } from "@/lib/db";
+import { cookies } from "next/headers";
+import { getEvaluationRunForSession } from "@/lib/persistence/getEvaluationRun";
+import { listEvaluationRunsDetailedForSession } from "@/lib/persistence/listEvaluationRuns";
+import { SESSION_COOKIE_NAME } from "@/lib/session/session";
 
-export async function listEvaluationRuns(limit = 50) {
-  return prisma.evaluationRun.findMany({
-    orderBy: { createdAt: "desc" },
-    take: limit,
-    include: {
-      artifact: {
-        select: { id: true, title: true, rawText: true }
-      }
-    }
-  });
+export async function listEvaluationRuns(limit = 100) {
+  const sessionId = (await cookies()).get(SESSION_COOKIE_NAME)?.value;
+  if (!sessionId) return [];
+  return listEvaluationRunsDetailedForSession(sessionId, limit);
 }
 
 export async function getEvaluationRunById(id: string) {
-  return prisma.evaluationRun.findUnique({
-    where: { id },
-    include: {
-      artifact: true,
-      criteria: {
-        orderBy: { criterionName: "asc" }
-      }
-    }
-  });
+  const sessionId = (await cookies()).get(SESSION_COOKIE_NAME)?.value;
+  if (!sessionId) return null;
+  return getEvaluationRunForSession(id, sessionId);
 }

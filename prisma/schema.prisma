@@ -7,162 +7,139 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id             String   @id @default(cuid())
-  email          String   @unique
-  name           String?
-  role           Role     @default(REVIEWER)
-  organizationId String?
-
-  organization Organization? @relation(fields: [organizationId], references: [id])
-  artifacts    Artifact[]
-  runs         EvaluationRun[]
-  templates    Template[]   @relation("TemplateCreatedBy")
-  playbooks    Playbook[]   @relation("PlaybookCreatedBy")
-  trainingSessions TrainingSession[] @relation("TrainingSessionCreatedBy")
-
+/// Anonymous browser session (§29). No PII.
+model Session {
+  id        String   @id @default(cuid())
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
 
-model Organization {
-  id   String @id @default(cuid())
-  name String
-
-  users            User[]
-  trainingSessions TrainingSession[]
+  artifacts      Artifact[]
+  evaluationRuns EvaluationRun[]
+  pendingUploads PendingUpload[]
+  deletionLogs   DeletionLog[]
 }
 
 model Artifact {
-  id        String   @id @default(cuid())
-  ownerId   String
-  title     String?
-  rawText   String
-  sourceType ArtifactSourceType
-  mimeType  String?
+  id         String         @id @default(cuid())
+  sessionId  String
+  title      String?
+  rawText    String         @db.Text
+  sourceType ArtifactSource
+  mimeType   String?
+  sampleId   String?
 
-  owner    User             @relation(fields: [ownerId], references: [id])
-  runs     EvaluationRun[]
-  examples TrainingExample[]
+  session Session         @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  runs    EvaluationRun[]
 
   createdAt DateTime @default(now())
 }
 
 model EvaluationRun {
-  id            String             @id @default(cuid())
-  artifactId    String
-  userId        String
-  rubricVersion String
-  status        EvaluationStatus   @default(PENDING)
-  overallGrade  Grade
+  id                   String    @id @default(cuid())
+  sessionId            String
+  artifactId           String
+  status               RunStatus
+  verdict              Verdict
+  overallScore         Float
+  rubricVersion        String
+  evaluatorId          String
+  evaluatorVersion     String
+  evaluationDurationMs Int
+  failureClassSummary  String[]
+  incompleteReason     String?
 
-  artifact Artifact          @relation(fields: [artifactId], references: [id])
-  user     User              @relation(fields: [userId], references: [id])
+  session  Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  artifact Artifact @relation(fields: [artifactId], references: [id], onDelete: Cascade)
+
   criteria CriterionResult[]
-  examples TrainingExample[]
 
-  createdAt   DateTime @default(now())
+  createdAt   DateTime  @default(now())
   completedAt DateTime?
 }
 
 model CriterionResult {
-  id              String   @id @default(cuid())
-  evaluationRunId String
-  invariantId     String
-  criterionName   String
-  grade           Grade
-  rationale       String
-  nextAction      String
+  id                   String           @id @default(cuid())
+  evaluationRunId      String
+  dimensionId          String
+  score                Float
+  maxScore             Float
+  verdict              CriterionVerdict
+  remediation          String           @db.Text
+  evidenceInsufficient Boolean          @default(false)
 
-  run EvaluationRun @relation(fields: [evaluationRunId], references: [id])
+  run EvaluationRun @relation(fields: [evaluationRunId], references: [id], onDelete: Cascade)
+
+  evidence       EvidenceExcerpt[]
+  failureClasses FailureClassRecord[]
 }
 
-model Template {
-  id          String   @id @default(cuid())
-  name        String
+model EvidenceExcerpt {
+  id                String @id @default(cuid())
+  criterionResultId String
+  excerptText       String @db.Text
+  location          String
+  relevance         String @db.Text
+
+  criterion CriterionResult @relation(fields: [criterionResultId], references: [id], onDelete: Cascade)
+}
+
+model FailureClassRecord {
+  id                String @id @default(cuid())
+  criterionResultId String
+  classId           String
+
+  criterion CriterionResult @relation(fields: [criterionResultId], references: [id], onDelete: Cascade)
+}
+
+model SampleArtifact {
+  id          String @id @default(cuid())
+  slug        String @unique
+  title       String
+  content     String @db.Text
   description String?
-  invariantId String?
-  content     String
+}
 
-  createdById String
-  createdBy   User   @relation("TemplateCreatedBy", fields: [createdById], references: [id])
-
-  steps PlaybookStep[]
-
+/// Temporary storage for upload → evaluate flow (§14).
+model PendingUpload {
+  id        String   @id @default(cuid())
+  sessionId String
+  title     String?
+  content   String   @db.Text
+  mimeType  String
   createdAt DateTime @default(now())
+
+  session Session @relation(fields: [sessionId], references: [id], onDelete: Cascade)
 }
 
-model Playbook {
-  id          String   @id @default(cuid())
-  name        String
-  description String?
+model DeletionLog {
+  id            String   @id @default(cuid())
+  sessionId     String
+  deletedRunIds String[]
+  deletedAt     DateTime @default(now())
+  metadata      Json?
 
-  createdById String
-  createdBy   User   @relation("PlaybookCreatedBy", fields: [createdById], references: [id])
-
-  steps PlaybookStep[]
-
-  createdAt DateTime @default(now())
+  session Session @relation(fields: [sessionId], references: [id], onDelete: Cascade)
 }
 
-model PlaybookStep {
-  id         String   @id @default(cuid())
-  order      Int
-  label      String
-  templateId String?
-  playbookId String
-
-  template Template? @relation(fields: [templateId], references: [id])
-  playbook Playbook @relation(fields: [playbookId], references: [id])
-}
-
-model TrainingSession {
-  id             String   @id @default(cuid())
-  organizationId String?
-  createdById    String
-  label          String?
-
-  organization Organization? @relation(fields: [organizationId], references: [id])
-  createdBy    User          @relation("TrainingSessionCreatedBy", fields: [createdById], references: [id])
-  examples     TrainingExample[]
-
-  createdAt DateTime @default(now())
-}
-
-model TrainingExample {
-  id              String   @id @default(cuid())
-  trainingSessionId String
-  artifactId      String
-  evaluationRunId String
-  revisionText    String
-
-  session  TrainingSession @relation(fields: [trainingSessionId], references: [id])
-  artifact Artifact        @relation(fields: [artifactId], references: [id])
-  run      EvaluationRun   @relation(fields: [evaluationRunId], references: [id])
-
-  createdAt DateTime @default(now())
-}
-
-enum Role {
-  ADMIN
-  REVIEWER
-  AUTHOR
-}
-
-enum ArtifactSourceType {
+enum ArtifactSource {
   PASTE
   UPLOAD
+  SAMPLE
 }
 
-enum EvaluationStatus {
-  PENDING
-  COMPLETED
-  FAILED
+enum RunStatus {
+  COMPLETE
+  INCOMPLETE
 }
 
-enum Grade {
+enum Verdict {
+  PASS
+  WARN
+  FAIL
+  NEEDS_HUMAN_REVIEW
+}
+
+enum CriterionVerdict {
   PASS
   WARN
   FAIL
 }
-

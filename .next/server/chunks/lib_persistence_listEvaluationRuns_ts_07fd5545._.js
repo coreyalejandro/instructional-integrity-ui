@@ -1,0 +1,3 @@
+module.exports=[25630,e=>{"use strict";var i=e.i(62294);let t={artifact:!0,criteria:{include:{evidence:!0,failureClasses:!0},orderBy:{dimensionId:"asc"}}};async function a(e,t=100){return i.prisma.evaluationRun.findMany({where:{sessionId:e},orderBy:{createdAt:"desc"},take:t,include:{artifact:{select:{id:!0,title:!0,rawText:!0}}}})}async function n(e,a=100){return i.prisma.evaluationRun.findMany({where:{sessionId:e},orderBy:{createdAt:"desc"},take:a,include:t})}e.s(["listEvaluationRunsDetailedForSession",()=>n,"listEvaluationRunsForSession",()=>a])}];
+
+//# sourceMappingURL=lib_persistence_listEvaluationRuns_ts_07fd5545._.js.map
