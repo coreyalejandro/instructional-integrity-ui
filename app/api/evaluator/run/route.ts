@@ -13,10 +13,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "artifactText is required" }, { status: 400 });
     }
 
+    const artifactTitle =
+      typeof body.artifactTitle === "string" && body.artifactTitle.trim() ? body.artifactTitle.trim() : undefined;
+
     const result = await runEvaluationPersisted({
       artifactText,
       rubricVersion: typeof body.rubricVersion === "string" ? body.rubricVersion : undefined,
-      userId: "anonymous-user",
+      artifactTitle,
       sourceType: "paste"
     });
 

@@ -6,7 +6,7 @@ describe("runEvaluation", () => {
   it("returns one result per rubric criterion", async () => {
     const result = await runEvaluation({ artifactText: "Example instructional artifact" });
 
-    expect(result.run.rubricVersion).toBe(currentRubric.version);
+    expect(result.rubricVersion).toBe(currentRubric.version);
     expect(result.criteria).toHaveLength(currentRubric.criteria.length);
   });
 
@@ -23,7 +23,7 @@ describe("runEvaluation", () => {
       return severity[item.grade] > severity[worst.grade] ? item : worst;
     }, result.criteria[0]);
 
-    expect(severity[result.run.overallGrade]).toBeGreaterThanOrEqual(severity[worstCriterion.grade]);
+    expect(severity[result.overallGrade]).toBeGreaterThanOrEqual(severity[worstCriterion.grade]);
   });
 });
 

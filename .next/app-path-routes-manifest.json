@@ -1,0 +1,11 @@
+{
+  "/_global-error/page": "/_global-error",
+  "/_not-found/page": "/_not-found",
+  "/api/evaluator/run/route": "/api/evaluator/run",
+  "/api/evaluator/runs/[id]/route": "/api/evaluator/runs/[id]",
+  "/api/evaluator/runs/route": "/api/evaluator/runs",
+  "/evaluate/page": "/evaluate",
+  "/page": "/",
+  "/runs/[id]/page": "/runs/[id]",
+  "/runs/page": "/runs"
+}

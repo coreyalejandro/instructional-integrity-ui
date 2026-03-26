@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
 export function PackageGrid() {
   return (
-    <section className="space-y-5">
+    <section id="packages" className="scroll-mt-24 space-y-5">
       <div>
         <p className="text-sm uppercase tracking-[0.24em] text-zinc-500">Package architecture</p>
         <h2 className="mt-2 text-3xl font-semibold">Every screen should map back to a package.</h2>

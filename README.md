@@ -39,40 +39,38 @@ A correct output misunderstood is still a failure. This is what separates cognit
 
 ## What Is Real Now
 
-- **Complete homepage UI** — Next.js 14 App Router with stable information architecture
-- **Journey-map flow** — 5-step product journey: understand framework → choose path → complete task → review evidence → production packages
-- **Evaluator interface** — mock with visible evidence states (`components/evaluator-panel.tsx`)
+- **App shell + navigation** — Overview (`/`), Evaluate (`/evaluate`), History (`/runs`, `/runs/[id]`)
+- **Persisted evaluations** — `POST /api/evaluator/run` creates `Artifact`, `EvaluationRun`, and `CriterionResult` rows via Prisma
+- **Journey-map flow** — 5-step product journey on the marketing home surface
+- **Evaluator workspace** — client panel with optional title, live API run, link to saved run detail (`components/evaluator-panel.tsx`)
 - **Rubric system** — structured evaluation criteria (`lib/rubric.ts`)
-- **Evaluator logic** — core evaluation engine (`lib/evaluator.ts`)
+- **Evaluator logic** — deterministic scoring engine (`lib/evaluator.ts`) with DB persistence (`runEvaluationPersisted`)
 - **Domain types** — typed domain model (`lib/domain.ts`)
-- **Data layer** — structured data access (`lib/data.ts`, `lib/db.ts`)
-- **API types** — typed API contracts (`lib/api-types.ts`)
-- **Prisma schema** — data model: User, Organization, Artifact, EvaluationRun, Template, Playbook, TrainingSession
-- **8 components** — evaluator-panel, footer, header, hero, journey-map, package-grid, ui/, workflow-overview
-- **Tests** — evaluator test suite (`lib/evaluator.test.ts`)
-- **Vitest configuration** — test runner configured (`vitest.config.mts`)
-- **Tailwind styling** — responsive, component-based design
-- **TypeScript** — full type coverage
+- **Data layer** — `lib/data.ts`, `lib/db.ts`, `lib/runs.ts`, `lib/demo-user.ts` (demo workspace user until auth)
+- **API** — run, list runs, fetch run by id under `/api/evaluator/*`
+- **Prisma + PostgreSQL** — schema with migrations; local DB via `docker-compose.yml` (default host port **5434**)
+- **Components** — app-shell, evaluate-cta, evaluator-panel, footer, header, hero, journey-map, package-grid, ui/, workflow-overview
+- **Tests** — evaluator unit tests (`lib/evaluator.test.ts`, `vitest.config.mts`)
 
-**Implementation status:** Prototype (working UI, evaluator interface, rubric system — no real evaluator execution, no auth, no persistence)
+**Implementation status:** MVP product loop (evaluate → persist → history → detail). Auth, uploads, and external LLM analysis are not implemented.
 
 ## How to Verify
 
 ```bash
-# Clone
 git clone <repo-url>
 cd instructional-integrity-ui
 
-# Install and run
+cp .env.example .env
 npm install
+npm run db:up
+npm run db:migrate
+npm run db:seed
+
 npm run dev
-# → http://localhost:3000
+# → http://localhost:3000 — open /evaluate, run a check, then /runs
 
-# Run tests
-npx vitest run
-
-# Inspect Prisma schema
-cat prisma/schema.prisma
+npm test
+npm run build
 ```
 
 ## Demo / Evidence

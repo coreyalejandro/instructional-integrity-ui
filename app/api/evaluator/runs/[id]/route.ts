@@ -1,16 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import type { EvaluationRunResult } from "@/lib/evaluator";
-import type { EvaluationRun, CriterionResult } from "@/lib/domain";
+import type { CriterionResultRecord, EvaluationRun } from "@/lib/domain";
 import type { Grade } from "@/lib/rubric";
 
 export async function GET(
   _request: NextRequest,
-  context: {
-    params: { id: string };
-  }
+  context: { params: Promise<{ id: string }> }
 ) {
-  const { id } = context.params;
+  const { id } = await context.params;
 
   try {
     const [runRecord, criteriaRecords] = await Promise.all([
@@ -37,10 +35,10 @@ export async function GET(
       overallGrade: runRecord.overallGrade as Grade
     };
 
-    const criteria: CriterionResult[] = criteriaRecords.map((item) => ({
+    const criteria: CriterionResultRecord[] = criteriaRecords.map((item) => ({
       id: item.id,
       evaluationRunId: item.evaluationRunId,
-      invariantId: item.invariantId as CriterionResult["invariantId"],
+      invariantId: item.invariantId as CriterionResultRecord["invariantId"],
       criterionName: item.criterionName,
       grade: item.grade as Grade,
       rationale: item.rationale,

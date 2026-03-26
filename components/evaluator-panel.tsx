@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState, useTransition } from "react";
 import type { EvaluationRunResult, CriterionResult } from "@/lib/evaluator";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -22,13 +23,13 @@ Steps:
 
 One section is too dense and needs revision.`;
 
-async function runEvaluatorRequest(artifactText: string): Promise<EvaluationRunResult> {
+async function runEvaluatorRequest(artifactText: string, artifactTitle?: string): Promise<EvaluationRunResult> {
   const response = await fetch("/api/evaluator/run", {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
     },
-    body: JSON.stringify({ artifactText })
+    body: JSON.stringify({ artifactText, artifactTitle })
   });
 
   if (!response.ok) {
@@ -42,6 +43,7 @@ async function runEvaluatorRequest(artifactText: string): Promise<EvaluationRunR
 
 export function EvaluatorPanel() {
   const [artifact, setArtifact] = useState(initialArtifact);
+  const [artifactTitle, setArtifactTitle] = useState("");
   const [result, setResult] = useState<EvaluationRunResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -95,7 +97,7 @@ export function EvaluatorPanel() {
 
     setError(null);
     startTransition(() => {
-      runEvaluatorRequest(trimmed)
+      runEvaluatorRequest(trimmed, artifactTitle.trim() || undefined)
         .then((data) => {
           setResult(data);
         })
@@ -115,11 +117,30 @@ export function EvaluatorPanel() {
         />
         <CardContent>
           <div className="space-y-4">
-            <textarea
-              value={artifact}
-              onChange={(event) => setArtifact(event.target.value)}
-              className="h-72 w-full rounded-3xl border border-border bg-zinc-950 p-4 text-sm leading-6 text-zinc-200 outline-none"
-            />
+            <div>
+              <label htmlFor="artifact-title" className="mb-1.5 block text-xs font-medium text-zinc-400">
+                Title (optional)
+              </label>
+              <input
+                id="artifact-title"
+                type="text"
+                value={artifactTitle}
+                onChange={(event) => setArtifactTitle(event.target.value)}
+                placeholder="e.g. Q2 onboarding checklist"
+                className="w-full rounded-2xl border border-border bg-zinc-950 px-4 py-2.5 text-sm text-zinc-200 outline-none placeholder:text-zinc-600"
+              />
+            </div>
+            <div>
+              <label htmlFor="artifact-body" className="mb-1.5 block text-xs font-medium text-zinc-400">
+                Instructional artifact
+              </label>
+              <textarea
+                id="artifact-body"
+                value={artifact}
+                onChange={(event) => setArtifact(event.target.value)}
+                className="h-72 w-full rounded-3xl border border-border bg-zinc-950 p-4 text-sm leading-6 text-zinc-200 outline-none"
+              />
+            </div>
             <div className="grid gap-3 sm:grid-cols-2">
               <button
                 type="button"
@@ -129,9 +150,18 @@ export function EvaluatorPanel() {
               >
                 {isPending ? "Running evaluator…" : "Run evaluator"}
               </button>
-              <button className="rounded-2xl border border-border bg-zinc-950 px-4 py-3 text-sm font-medium text-white">
-                Open revision template
-              </button>
+              {result ? (
+                <Link
+                  href={`/runs/${result.run.id}`}
+                  className="inline-flex items-center justify-center rounded-2xl border border-border bg-zinc-950 px-4 py-3 text-center text-sm font-medium text-white transition hover:bg-zinc-900"
+                >
+                  Open saved run
+                </Link>
+              ) : (
+                <span className="inline-flex items-center justify-center rounded-2xl border border-dashed border-zinc-700 bg-zinc-950/50 px-4 py-3 text-center text-sm text-zinc-500">
+                  Saved run link appears after you evaluate
+                </span>
+              )}
               {error ? <p className="col-span-2 text-xs text-red-400">{error}</p> : null}
             </div>
           </div>

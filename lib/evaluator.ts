@@ -1,6 +1,7 @@
 import { currentRubric, Grade, InvariantId } from "./rubric";
 import { prisma } from "./db";
 import type { EvaluationRun } from "./domain";
+import { ensureDemoUser } from "./demo-user";
 
 export interface EvaluationRunInput {
   artifactText: string;
@@ -86,13 +87,14 @@ export async function runEvaluation(input: EvaluationRunInput): Promise<Evaluati
 }
 
 interface RunEvaluationPersistedInput extends EvaluationRunInput {
-  userId: string;
   sourceType: "paste" | "upload";
-  title?: string;
+  /** Optional display title for history lists */
+  artifactTitle?: string;
   mimeType?: string | null;
 }
 
 export async function runEvaluationPersisted(input: RunEvaluationPersistedInput): Promise<EvaluationRunResult> {
+  const { id: ownerId } = await ensureDemoUser();
   const evaluation = await runEvaluation({
     artifactText: input.artifactText,
     rubricVersion: input.rubricVersion
@@ -100,8 +102,8 @@ export async function runEvaluationPersisted(input: RunEvaluationPersistedInput)
 
   const artifact = await prisma.artifact.create({
     data: {
-      ownerId: input.userId,
-      title: input.title,
+      ownerId,
+      title: input.artifactTitle,
       rawText: input.artifactText,
       sourceType: input.sourceType === "paste" ? "PASTE" : "UPLOAD",
       mimeType: input.mimeType ?? undefined
@@ -111,7 +113,7 @@ export async function runEvaluationPersisted(input: RunEvaluationPersistedInput)
   const runRecord = await prisma.evaluationRun.create({
     data: {
       artifactId: artifact.id,
-      userId: input.userId,
+      userId: ownerId,
       rubricVersion: evaluation.rubricVersion,
       status: "COMPLETED",
       overallGrade: evaluation.overallGrade,

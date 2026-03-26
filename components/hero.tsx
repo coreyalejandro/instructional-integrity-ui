@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { ArrowRight, Shield, Workflow } from "lucide-react";
 
 export function Hero() {
@@ -16,12 +17,18 @@ export function Hero() {
           then move directly into templates, playbooks, and AI training workflows with no context loss.
         </p>
         <div className="mt-8 flex flex-wrap gap-3">
-          <button className="rounded-2xl bg-white px-5 py-3 text-sm font-medium text-black">
+          <Link
+            href="/evaluate"
+            className="inline-flex items-center justify-center rounded-2xl bg-white px-5 py-3 text-sm font-medium text-black transition hover:bg-zinc-200"
+          >
             Start with the evaluator
-          </button>
-          <button className="rounded-2xl border border-border bg-zinc-950 px-5 py-3 text-sm font-medium text-white">
+          </Link>
+          <a
+            href="#packages"
+            className="inline-flex items-center justify-center rounded-2xl border border-border bg-zinc-950 px-5 py-3 text-sm font-medium text-white transition hover:bg-zinc-900"
+          >
             Browse the package system
-          </button>
+          </a>
         </div>
       </div>
       <div className="rounded-[32px] border border-border bg-zinc-950 p-6 shadow-glow">

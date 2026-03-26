@@ -1,3 +1,11 @@
 {
-  "/_not-found/page": "app/_not-found/page.js"
+  "/_global-error/page": "app/_global-error/page.js",
+  "/_not-found/page": "app/_not-found/page.js",
+  "/api/evaluator/run/route": "app/api/evaluator/run/route.js",
+  "/api/evaluator/runs/[id]/route": "app/api/evaluator/runs/[id]/route.js",
+  "/api/evaluator/runs/route": "app/api/evaluator/runs/route.js",
+  "/evaluate/page": "app/evaluate/page.js",
+  "/page": "app/page.js",
+  "/runs/[id]/page": "app/runs/[id]/page.js",
+  "/runs/page": "app/runs/page.js"
 }
