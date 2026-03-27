@@ -73,7 +73,7 @@ Database listens on **localhost:5434** by default (see `docker-compose.yml`).
 | 14 | Delete run + audit log | implemented |
 | 15 | JSON export | implemented |
 | 16 | Markdown export | implemented |
-| 17 | Error schema + UI errors | partial |
+| 17 | Error schema + UI errors | implemented |
 
 ## 9. Not implemented / deferred (§18)
 
@@ -93,7 +93,7 @@ npm run test:e2e   # requires dev server; see playwright.config.ts
 
 ## 11. Environment
 
-See [`.env.example`](.env.example) for `DATABASE_URL`, `LOG_LEVEL`, limits, and timeouts.
+See [`.env.example`](.env.example) for `DATABASE_URL`, `LOG_LEVEL`, limits, timeouts, and optional `CORS_ALLOWED_ORIGINS`. The contract also references [`config/.env.example`](config/.env.example) (same template).
 
 ## 12. Architectural map
 

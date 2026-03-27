@@ -9,6 +9,9 @@ export function computeVerdictFromCriteria(criteria: CriterionEvaluationResult[]
   verdict: Verdict;
   failureClassSummary: FailureClassId[];
 } {
+  if (criteria.length === 0) {
+    return { verdict: "needs_human_review", failureClassSummary: [] };
+  }
   const insufficient = criteria.filter((c) => c.evidenceInsufficient).length;
   const anyFail = criteria.some((c) => c.verdict === "fail");
   const anyWarn = criteria.some((c) => c.verdict === "warn");

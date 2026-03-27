@@ -59,7 +59,33 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist
 var __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$session$2f$session$2e$ts__$5b$middleware$2d$edge$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/lib/session/session.ts [middleware-edge] (ecmascript)");
 ;
 ;
+/** §12.2 — reject browser cross-origin API calls unless origin is allowlisted. */ function crossOriginApiBlocked(request) {
+    if (!request.nextUrl.pathname.startsWith("/api")) return null;
+    const origin = request.headers.get("origin");
+    if (!origin) return null;
+    const self = request.nextUrl.origin;
+    const allowed = new Set([
+        self
+    ]);
+    const extra = process.env.CORS_ALLOWED_ORIGINS?.split(",").map((s)=>s.trim()).filter(Boolean);
+    if (extra) for (const o of extra)allowed.add(o);
+    if (allowed.has(origin)) return null;
+    return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$esm$2f$server$2f$web$2f$exports$2f$index$2e$js__$5b$middleware$2d$edge$5d$__$28$ecmascript$29$__["NextResponse"].json({
+        error: {
+            code: "CORS_FORBIDDEN",
+            message: "Cross-origin API access is not allowed for this origin.",
+            recoveryGuidance: "Use the app from the same origin, or set CORS_ALLOWED_ORIGINS for trusted browser origins when self-hosting.",
+            details: {
+                origin
+            }
+        }
+    }, {
+        status: 403
+    });
+}
 function middleware(request) {
+    const blocked = crossOriginApiBlocked(request);
+    if (blocked) return blocked;
     const res = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$esm$2f$server$2f$web$2f$exports$2f$index$2e$js__$5b$middleware$2d$edge$5d$__$28$ecmascript$29$__["NextResponse"].next();
     if (!request.cookies.get(__TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$session$2f$session$2e$ts__$5b$middleware$2d$edge$5d$__$28$ecmascript$29$__["SESSION_COOKIE_NAME"])?.value) {
         res.cookies.set(__TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$session$2f$session$2e$ts__$5b$middleware$2d$edge$5d$__$28$ecmascript$29$__["SESSION_COOKIE_NAME"], crypto.randomUUID(), {

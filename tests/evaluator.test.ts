@@ -24,9 +24,13 @@ describe("rule-based evaluator", () => {
 
   it("is deterministic across repeated runs (§5.4)", () => {
     const normalized = normalizeArtifact({ title: "t", raw: SAMPLE });
-    const a = JSON.stringify(runRuleBasedEvaluation(normalized, getRubric()));
-    const b = JSON.stringify(runRuleBasedEvaluation(normalized, getRubric()));
-    const c = JSON.stringify(runRuleBasedEvaluation(normalized, getRubric()));
+    const strip = (p: ReturnType<typeof runRuleBasedEvaluation>) => {
+      const { evaluationDurationMs: _, ...rest } = p;
+      return JSON.stringify(rest);
+    };
+    const a = strip(runRuleBasedEvaluation(normalized, getRubric()));
+    const b = strip(runRuleBasedEvaluation(normalized, getRubric()));
+    const c = strip(runRuleBasedEvaluation(normalized, getRubric()));
     expect(a).toBe(b);
     expect(b).toBe(c);
   });
@@ -73,5 +77,62 @@ describe("verdict calculation (§20.1)", () => {
       }
     ]);
     expect(verdict).toBe("fail");
+  });
+
+  it("returns warn when any criterion warns and none fail", () => {
+    const { verdict } = computeVerdictFromCriteria([
+      {
+        dimensionId: "a",
+        score: 10,
+        maxScore: 10,
+        verdict: "pass",
+        evidence: [],
+        failureClasses: [],
+        remediation: "",
+        evidenceInsufficient: false
+      },
+      {
+        dimensionId: "b",
+        score: 5,
+        maxScore: 10,
+        verdict: "warn",
+        evidence: [],
+        failureClasses: [],
+        remediation: "x",
+        evidenceInsufficient: false
+      }
+    ]);
+    expect(verdict).toBe("warn");
+  });
+
+  it("returns needs_human_review when evidence insufficient on 2+ criteria", () => {
+    const { verdict } = computeVerdictFromCriteria([
+      {
+        dimensionId: "a",
+        score: 10,
+        maxScore: 10,
+        verdict: "pass",
+        evidence: [],
+        failureClasses: [],
+        remediation: "",
+        evidenceInsufficient: true
+      },
+      {
+        dimensionId: "b",
+        score: 10,
+        maxScore: 10,
+        verdict: "pass",
+        evidence: [],
+        failureClasses: [],
+        remediation: "",
+        evidenceInsufficient: true
+      }
+    ]);
+    expect(verdict).toBe("needs_human_review");
+  });
+
+  it("returns needs_human_review for empty criteria (§20.1 edge)", () => {
+    const { verdict } = computeVerdictFromCriteria([]);
+    expect(verdict).toBe("needs_human_review");
   });
 });

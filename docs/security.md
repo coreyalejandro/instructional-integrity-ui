@@ -4,7 +4,7 @@
 |---------|-----------|-------------|
 | Paste input | XSS, oversized payload, control-character abuse | `sanitizeInput`, size limits, Zod validation, CSP headers |
 | File upload | MIME spoofing, path traversal, binary payloads | Server-only parsing, extension + MIME cross-check, size cap, UTF-8 validation |
-| API | CSRF on mutations, abuse | Same-site session cookie; CORS default same-origin; future: rate limits |
+| API | CSRF on mutations, cross-origin abuse | Same-site session cookie; `/api` rejects foreign `Origin` unless listed in `CORS_ALLOWED_ORIGINS`; future: rate limits |
 | Exports | Injection into markdown/HTML consumers | `sanitizeExportContent` for exports |
 | Database | SQL injection | Prisma parameterized queries only |
 | Session scope | Cross-session data access | Runs keyed by `sessionId` from HttpOnly cookie |

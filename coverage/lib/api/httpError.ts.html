@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/14</span>
+                <span class='fraction'>14/14</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/12</span>
+                <span class='fraction'>12/12</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/2</span>
+                <span class='fraction'>2/2</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/13</span>
+                <span class='fraction'>13/13</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -121,7 +121,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -135,41 +135,41 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">14x</span>
+<span class="cline-any cline-yes">14x</span>
+<span class="cline-any cline-yes">11x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { NextResponse } from "next/server";
 import { ERROR_CODES, type ErrorCode } from "@/lib/domain/errorTypes";
 &nbsp;
-export function <span class="fstat-no" title="function not covered" >jsonError(</span>
+export function jsonError(
   code: ErrorCode | string,
   message: string,
   recoveryGuidance: string,
   status: number,
   details?: Record&lt;string, unknown&gt;
 ) {
-<span class="cstat-no" title="statement not covered" >  return NextResponse.json(</span>
+  return NextResponse.json(
     {
       error: {
         code,
@@ -182,29 +182,29 @@ export function <span class="fstat-no" title="function not covered" >jsonError(<
   );
 }
 &nbsp;
-export function <span class="fstat-no" title="function not covered" >mapKnownError(e</span>rr: unknown): { code: ErrorCode; status: number; message: string } | null {
-  const code = (<span class="cstat-no" title="statement not covered" >err as Error &amp; { code?: string }).code;</span>
-<span class="cstat-no" title="statement not covered" >  if (!code) <span class="cstat-no" title="statement not covered" >return null;</span></span>
-<span class="cstat-no" title="statement not covered" >  switch (code) {</span>
+export function mapKnownError(err: unknown): { code: ErrorCode; status: number; message: string } | null {
+  const code = (err as Error &amp; { code?: string }).code;
+  if (!code) return null;
+  switch (code) {
     case ERROR_CODES.EMPTY_INPUT:
-<span class="cstat-no" title="statement not covered" >      return { code: ERROR_CODES.EMPTY_INPUT, status: 400, message: (err as Error).message };</span>
+      return { code: ERROR_CODES.EMPTY_INPUT, status: 400, message: (err as Error).message };
     case ERROR_CODES.INPUT_TOO_LARGE:
-<span class="cstat-no" title="statement not covered" >      return { code: ERROR_CODES.INPUT_TOO_LARGE, status: 413, message: (err as Error).message };</span>
+      return { code: ERROR_CODES.INPUT_TOO_LARGE, status: 413, message: (err as Error).message };
     case ERROR_CODES.UNSUPPORTED_MEDIA_TYPE:
-<span class="cstat-no" title="statement not covered" >      return { code: ERROR_CODES.UNSUPPORTED_MEDIA_TYPE, status: 415, message: (err as Error).message };</span>
+      return { code: ERROR_CODES.UNSUPPORTED_MEDIA_TYPE, status: 415, message: (err as Error).message };
     case ERROR_CODES.INVALID_EXTENSION:
     case ERROR_CODES.MISMATCHED_TYPE:
-<span class="cstat-no" title="statement not covered" >      return { code: code as ErrorCode, status: 400, message: (err as Error).message };</span>
+      return { code: code as ErrorCode, status: 400, message: (err as Error).message };
     case ERROR_CODES.ENCODING_INVALID:
-<span class="cstat-no" title="statement not covered" >      return { code: ERROR_CODES.ENCODING_INVALID, status: 400, message: (err as Error).message };</span>
+      return { code: ERROR_CODES.ENCODING_INVALID, status: 400, message: (err as Error).message };
     case ERROR_CODES.NORMALIZATION_FAILED:
-<span class="cstat-no" title="statement not covered" >      return { code: ERROR_CODES.NORMALIZATION_FAILED, status: 400, message: (err as Error).message };</span>
+      return { code: ERROR_CODES.NORMALIZATION_FAILED, status: 400, message: (err as Error).message };
     case ERROR_CODES.UPLOAD_NOT_FOUND:
-<span class="cstat-no" title="statement not covered" >      return { code: ERROR_CODES.UPLOAD_NOT_FOUND, status: 400, message: (err as Error).message };</span>
+      return { code: ERROR_CODES.UPLOAD_NOT_FOUND, status: 400, message: (err as Error).message };
     case ERROR_CODES.SAMPLE_NOT_FOUND:
-<span class="cstat-no" title="statement not covered" >      return { code: ERROR_CODES.SAMPLE_NOT_FOUND, status: 400, message: (err as Error).message };</span>
+      return { code: ERROR_CODES.SAMPLE_NOT_FOUND, status: 400, message: (err as Error).message };
     default:
-<span class="cstat-no" title="statement not covered" >      return null;</span>
+      return null;
   }
 }
 &nbsp;</pre></td></tr></table></pre>
@@ -214,7 +214,7 @@ export function <span class="fstat-no" title="function not covered" >mapKnownErr
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-03-26T21:08:19.580Z
+                at 2026-03-27T06:48:37.261Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

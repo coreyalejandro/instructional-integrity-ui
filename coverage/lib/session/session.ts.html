@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/8</span>
+                <span class='fraction'>8/8</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/6</span>
+                <span class='fraction'>6/6</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/2</span>
+                <span class='fraction'>2/2</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/8</span>
+                <span class='fraction'>8/8</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -94,58 +94,58 @@
 <a name='L29'></a><a href='#L29'>29</a>
 <a name='L30'></a><a href='#L30'>30</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">14x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">14x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">17x</span>
+<span class="cline-any cline-yes">17x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">14x</span>
+<span class="cline-any cline-yes">14x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import type { NextRequest } from "next/server";
 &nbsp;
-export const SESSION_COOKIE_NAME = <span class="cstat-no" title="statement not covered" >"iis_session";</span>
+export const SESSION_COOKIE_NAME = "iis_session";
 &nbsp;
-function <span class="fstat-no" title="function not covered" >buildSessionCookie(v</span>alue: string): string {
-  const parts = <span class="cstat-no" title="statement not covered" >[</span>
+function buildSessionCookie(value: string): string {
+  const parts = [
     `${SESSION_COOKIE_NAME}=${encodeURIComponent(value)}`,
     "Path=/",
     "HttpOnly",
     "SameSite=Lax",
     process.env.NODE_ENV === "production" ? "Secure" : ""
   ].filter(Boolean);
-<span class="cstat-no" title="statement not covered" >  return parts.join("; ");</span>
+  return parts.join("; ");
 }
 &nbsp;
-export async function <span class="fstat-no" title="function not covered" >resolveSession(r</span>equest: NextRequest): Promise&lt;{
+export async function resolveSession(request: NextRequest): Promise&lt;{
   sessionId: string;
   setCookieHeader?: string;
 }&gt; {
-  const existing = <span class="cstat-no" title="statement not covered" >request.cookies.get(SESSION_COOKIE_NAME)?.value;</span>
-<span class="cstat-no" title="statement not covered" >  if (existing &amp;&amp; existing.length &gt; 8) {</span>
-<span class="cstat-no" title="statement not covered" >    return { sessionId: existing };</span>
+  const existing = request.cookies.get(SESSION_COOKIE_NAME)?.value;
+  if (existing &amp;&amp; existing.length &gt; 8) {
+    return { sessionId: existing };
   }
-  const sessionId = <span class="cstat-no" title="statement not covered" >crypto.randomUUID();</span>
-<span class="cstat-no" title="statement not covered" >  return {</span>
+  const sessionId = crypto.randomUUID();
+  return {
     sessionId,
     setCookieHeader: buildSessionCookie(sessionId)
   };
@@ -157,7 +157,7 @@ export async function <span class="fstat-no" title="function not covered" >resol
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-03-26T21:08:19.580Z
+                at 2026-03-27T06:48:37.261Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

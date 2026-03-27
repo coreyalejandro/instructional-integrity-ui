@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { jsonError, mapKnownError } from "@/lib/api/httpError";
+import { recoveryForKnownError } from "@/lib/api/recoveryMessages";
 import { ERROR_CODES } from "@/lib/domain/errorTypes";
 import { sanitizeInstructionalText } from "@/lib/artifacts/sanitizeInput";
 import { validateUploadBuffer } from "@/lib/artifacts/validateInput";
@@ -82,12 +83,7 @@ export async function POST(request: NextRequest) {
   } catch (err) {
     const known = mapKnownError(err);
     if (known) {
-      return jsonError(
-        known.code,
-        known.message,
-        "Use a .txt or .md file under the size limit with matching MIME type.",
-        known.status
-      );
+      return jsonError(known.code, known.message, recoveryForKnownError(known.code), known.status);
     }
     log.error({ err, event: "upload_error" }, "Upload failed");
     return jsonError(ERROR_CODES.INTERNAL, "Upload failed", "Retry with a supported file type.", 500);

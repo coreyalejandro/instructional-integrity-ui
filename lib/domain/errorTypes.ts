@@ -13,7 +13,11 @@ export const ERROR_CODES = {
   EVALUATION_TIMEOUT: "EVALUATION_TIMEOUT",
   PERSISTENCE_FAILED: "PERSISTENCE_FAILED",
   EXPORT_FAILED: "EXPORT_FAILED",
-  INTERNAL: "INTERNAL"
+  INTERNAL: "INTERNAL",
+  /** Too many in-flight evaluations for this instance (§19.1). */
+  CONCURRENT_LIMIT: "CONCURRENT_LIMIT",
+  /** Cross-origin request to /api without allowlist (§12.2). */
+  CORS_FORBIDDEN: "CORS_FORBIDDEN"
 } as const;
 
 export type ErrorCode = (typeof ERROR_CODES)[keyof typeof ERROR_CODES];

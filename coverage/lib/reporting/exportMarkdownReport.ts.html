@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/11</span>
+                <span class='fraction'>11/11</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">50% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/2</span>
+                <span class='fraction'>1/2</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/2</span>
+                <span class='fraction'>2/2</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/10</span>
+                <span class='fraction'>10/10</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -121,8 +121,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-yes">11x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -141,17 +141,17 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-yes">11x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">11x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">11x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import type { Prisma } from "@prisma/client";
 import { sanitizeExportText } from "./sanitizeExportContent";
@@ -165,9 +165,9 @@ type RunWithRelations = Prisma.EvaluationRunGetPayload&lt;{
   };
 }&gt;;
 &nbsp;
-export function <span class="fstat-no" title="function not covered" >buildMarkdownExport(r</span>un: RunWithRelations): string {
-  const <span class="cstat-no" title="statement not covered" >title = sanitizeExportText(run.artifact.title ?? "Untitled artifact");</span>
-  const lines: string[] = <span class="cstat-no" title="statement not covered" >[</span>
+export function buildMarkdownExport(run: RunWithRelations): string {
+  const title = sanitizeExportText(run.artifact.title ?? <span class="branch-1 cbranch-no" title="branch not covered" >"Untitled artifact");</span>
+  const lines: string[] = [
     `# Evaluation report: ${title}`,
     "",
     `- **Run ID:** ${run.id}`,
@@ -186,17 +186,17 @@ export function <span class="fstat-no" title="function not covered" >buildMarkdo
     ""
   ];
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  for (const c of run.criteria) {</span>
-<span class="cstat-no" title="statement not covered" >    lines.push(`### ${c.dimensionId}`, "", `- Score: ${c.score} / ${c.maxScore}`, `- Verdict: ${c.verdict}`, "");</span>
-<span class="cstat-no" title="statement not covered" >    lines.push("**Remediation:**", "", c.remediation, "");</span>
-<span class="cstat-no" title="statement not covered" >    lines.push("**Evidence:**", "");</span>
-<span class="cstat-no" title="statement not covered" >    for (const e of c.evidence) {</span>
-<span class="cstat-no" title="statement not covered" >      lines.push(`- _${sanitizeExportText(e.location)}_: ${sanitizeExportText(e.excerptText)}`);</span>
+  for (const c of run.criteria) {
+    lines.push(`### ${c.dimensionId}`, "", `- Score: ${c.score} / ${c.maxScore}`, `- Verdict: ${c.verdict}`, "");
+    lines.push("**Remediation:**", "", c.remediation, "");
+    lines.push("**Evidence:**", "");
+    for (const e of c.evidence) {
+      lines.push(`- _${sanitizeExportText(e.location)}_: ${sanitizeExportText(e.excerptText)}`);
     }
-<span class="cstat-no" title="statement not covered" >    lines.push("", "**Failure classes:**", c.failureClasses.<span class="fstat-no" title="function not covered" >map((f</span>) =&gt; <span class="cstat-no" title="statement not covered" >`- ${f.classId}`).</span>join("\n"), "");</span>
+    lines.push("", "**Failure classes:**", c.failureClasses.map((f) =&gt; `- ${f.classId}`).join("\n"), "");
   }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  return lines.join("\n");</span>
+  return lines.join("\n");
 }
 &nbsp;</pre></td></tr></table></pre>
 
@@ -205,7 +205,7 @@ export function <span class="fstat-no" title="function not covered" >buildMarkdo
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-03-26T21:08:19.580Z
+                at 2026-03-27T06:48:37.261Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

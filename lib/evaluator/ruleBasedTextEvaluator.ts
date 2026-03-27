@@ -227,10 +227,86 @@ function criterionVerdictFromScore(score: number, maxScore: number): "pass" | "w
   return "fail";
 }
 
-export function runRuleBasedEvaluation(artifact: NormalizedArtifact, rubric: Rubric = defaultRubric): EvaluationResultPayload {
+export interface RuleBasedEvaluationOptions {
+  /** Wall-clock budget; checked between rubric dimensions (§19.1). */
+  deadlineMs?: number;
+}
+
+function buildRemediation(
+  verdict: "pass" | "warn" | "fail",
+  dim: { remediationGuidance: string },
+  ev: { excerpt: string; location: string }
+): string {
+  if (verdict === "pass") {
+    return "No change required for this dimension based on rule-based signals.";
+  }
+  const clip = ev.excerpt.trim().slice(0, 140);
+  const suffix = clip.length ? ` Reference the supporting excerpt (${ev.location}): "${clip}${ev.excerpt.trim().length > 140 ? "…" : ""}"` : "";
+  return `${dim.remediationGuidance}${suffix}`;
+}
+
+function finalizeEvaluationPayload(
+  criterionResults: CriterionEvaluationResult[],
+  rubric: Rubric,
+  status: "complete" | "incomplete",
+  incompleteReason: string | undefined,
+  evaluatorStartedAt: number
+): EvaluationResultPayload {
+  const dimById = new Map(rubric.dimensions.map((d) => [d.id, d]));
+  let overallScore = 0;
+  if (criterionResults.length > 0) {
+    const weightSum = criterionResults.reduce((acc, c) => acc + (dimById.get(c.dimensionId)?.weight ?? 0), 0);
+    if (weightSum > 0) {
+      overallScore = Math.round(
+        (criterionResults.reduce(
+          (acc, c) => acc + (c.score / c.maxScore) * (dimById.get(c.dimensionId)?.weight ?? 0),
+          0
+        ) /
+          weightSum) *
+          100 *
+          100
+      ) / 100;
+    }
+  }
+
+  const { verdict, failureClassSummary } = computeVerdictFromCriteria(criterionResults);
+
+  return {
+    status,
+    verdict,
+    overallScore,
+    criterionResults,
+    failureClassSummary,
+    rubricVersion: rubric.version,
+    evaluatorId: EVALUATOR_ID,
+    evaluatorVersion: EVALUATOR_VERSION,
+    evaluationDurationMs: Date.now() - evaluatorStartedAt,
+    incompleteReason
+  };
+}
+
+export function runRuleBasedEvaluation(
+  artifact: NormalizedArtifact,
+  rubric: Rubric = defaultRubric,
+  options?: RuleBasedEvaluationOptions
+): EvaluationResultPayload {
+  const evaluatorStartedAt = Date.now();
+  const deadline =
+    options?.deadlineMs !== undefined ? evaluatorStartedAt + Math.max(0, options.deadlineMs) : undefined;
+
   const criterionResults: CriterionEvaluationResult[] = [];
 
   for (const dim of rubric.dimensions) {
+    if (deadline !== undefined && Date.now() >= deadline) {
+      return finalizeEvaluationPayload(
+        criterionResults,
+        rubric,
+        "incomplete",
+        "Evaluation exceeded the configured time budget (EVALUATION_TIMEOUT_MS). Partial criterion results below were produced before the limit.",
+        evaluatorStartedAt
+      );
+    }
+
     const ev = evaluateDimension(dim.id, artifact);
     const verdict = criterionVerdictFromScore(ev.score, dim.maxScore);
     const evidenceInsufficient = ev.excerpt.trim().length === 0;
@@ -248,39 +324,12 @@ export function runRuleBasedEvaluation(artifact: NormalizedArtifact, rubric: Rub
         }
       ],
       failureClasses: ev.failureClasses,
-      remediation:
-        verdict === "pass"
-          ? "No change required for this dimension based on rule-based signals."
-          : dim.remediationGuidance,
+      remediation: buildRemediation(verdict, dim, ev),
       evidenceInsufficient
     });
   }
 
-  const weights = rubric.dimensions.map((d) => d.weight);
-  const sumW = weights.reduce((a, b) => a + b, 0);
-  const overallScore =
-    sumW === 0
-      ? 0
-      : Math.round(
-          (criterionResults.reduce((acc, c, i) => acc + (c.score / c.maxScore) * rubric.dimensions[i]!.weight, 0) /
-            sumW) *
-            100 *
-            100
-        ) / 100;
-
-  const { verdict, failureClassSummary } = computeVerdictFromCriteria(criterionResults);
-
-  return {
-    status: "complete",
-    verdict,
-    overallScore,
-    criterionResults,
-    failureClassSummary,
-    rubricVersion: rubric.version,
-    evaluatorId: EVALUATOR_ID,
-    evaluatorVersion: EVALUATOR_VERSION,
-    evaluationDurationMs: 0
-  };
+  return finalizeEvaluationPayload(criterionResults, rubric, "complete", undefined, evaluatorStartedAt);
 }
 
 export const ruleBasedTextEvaluator: Evaluator = {

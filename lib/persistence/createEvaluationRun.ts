@@ -107,6 +107,12 @@ export async function createEvaluationRunRecord(input: {
             }
           });
         }
+        await tx.remediationSuggestion.create({
+          data: {
+            criterionResultId: row.id,
+            suggestionText: c.remediation
+          }
+        });
       }
 
       return { runId: run.id, artifactId: artifact.id };

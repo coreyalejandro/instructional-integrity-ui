@@ -3,7 +3,9 @@ import { normalizeArtifact } from "@/lib/artifacts/normalizeArtifact";
 import { validatePasteLength } from "@/lib/artifacts/validateInput";
 import { mapRunToApiResponse } from "@/lib/api/evaluationMapper";
 import { jsonError, mapKnownError } from "@/lib/api/httpError";
+import { recoveryForKnownError } from "@/lib/api/recoveryMessages";
 import { ERROR_CODES } from "@/lib/domain/errorTypes";
+import { EvaluationConcurrencyLimiter, getMaxConcurrentEvaluations } from "@/lib/evaluation/concurrency";
 import { evaluateNormalizedArtifact } from "@/lib/evaluator/evaluateArtifact";
 import { getLogger } from "@/lib/logging/logger";
 import { createEvaluationRunRecord } from "@/lib/persistence/createEvaluationRun";
@@ -13,6 +15,15 @@ import { resolveSession } from "@/lib/session/session";
 import { postEvaluationBodySchema } from "@/lib/validation/schemas";
 
 const log = getLogger();
+
+const concurrencyLimiter = new EvaluationConcurrencyLimiter(getMaxConcurrentEvaluations());
+
+function getEvaluationTimeoutMs(): number {
+  const raw = process.env.EVALUATION_TIMEOUT_MS;
+  const n = raw !== undefined ? Number.parseInt(String(raw).replace(/"/g, ""), 10) : 30_000;
+  if (!Number.isFinite(n)) return 30_000;
+  return Math.min(Math.max(n, 100), 600_000);
+}
 
 async function resolveArtifactForSession(
   sessionId: string,
@@ -85,6 +96,15 @@ export async function POST(request: NextRequest) {
   const { sessionId, setCookieHeader } = await resolveSession(request);
   const started = Date.now();
 
+  if (!concurrencyLimiter.tryEnter()) {
+    return jsonError(
+      ERROR_CODES.CONCURRENT_LIMIT,
+      "Too many evaluations are running on this instance.",
+      "Wait a few seconds and retry, or open History to confirm whether a run completed.",
+      429
+    );
+  }
+
   try {
     const json = await request.json();
     const parsed = postEvaluationBodySchema.safeParse(json);
@@ -104,10 +124,9 @@ export async function POST(request: NextRequest) {
       raw: artifactPayload.rawText
     });
 
-    const evalStarted = Date.now();
-    // Synchronous rule-based evaluator; timeout enforced when async evaluators are added (§19.1).
-    const evaluationResult = evaluateNormalizedArtifact(normalized);
-    evaluationResult.evaluationDurationMs = Date.now() - evalStarted;
+    const evaluationResult = evaluateNormalizedArtifact(normalized, {
+      deadlineMs: getEvaluationTimeoutMs()
+    });
 
     const created = await createEvaluationRunRecord({
       sessionId,
@@ -149,14 +168,7 @@ export async function POST(request: NextRequest) {
   } catch (err) {
     const known = mapKnownError(err);
     if (known) {
-      return jsonError(
-        known.code,
-        known.message,
-        known.code === ERROR_CODES.EMPTY_INPUT
-          ? "Provide non-empty instructional text or choose a valid sample/upload."
-          : "Fix the reported constraint and try again.",
-        known.status
-      );
+      return jsonError(known.code, known.message, recoveryForKnownError(known.code), known.status);
     }
     log.error({ err, event: "evaluation_post_error" }, "Evaluation failed");
     return jsonError(
@@ -165,6 +177,8 @@ export async function POST(request: NextRequest) {
       "Retry with a smaller artifact or contact support if this persists.",
       500
     );
+  } finally {
+    concurrencyLimiter.leave();
   }
 }
 

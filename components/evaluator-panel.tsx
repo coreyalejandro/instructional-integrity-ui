@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { CognitiveSafetyGlossary } from "@/components/cognitive-safety-glossary";
 import { ErrorDisplay } from "@/components/error-display";
@@ -49,15 +49,21 @@ async function postEvaluation(body: unknown): Promise<ApiEvaluationResponse> {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body)
   });
-  const data = await response.json().catch(() => ({}));
+  const data = (await response.json().catch(() => ({}))) as {
+    error?: { message?: string; recoveryGuidance?: string; code?: string };
+  };
   if (!response.ok) {
-    const msg =
-      data?.error?.message && data?.error?.recoveryGuidance
-        ? `${data.error.message} — ${data.error.recoveryGuidance}`
-        : typeof data?.error === "string"
-          ? data.error
-          : "Evaluation request failed.";
-    throw new Error(msg);
+    const e = data?.error;
+    if (e?.message && e?.recoveryGuidance) {
+      const err = new Error(e.message) as Error & {
+        recoveryGuidance: string;
+        code?: string;
+      };
+      err.recoveryGuidance = e.recoveryGuidance;
+      err.code = e.code;
+      throw err;
+    }
+    throw new Error("Evaluation request failed.");
   }
   return data as ApiEvaluationResponse;
 }
@@ -68,8 +74,9 @@ export function EvaluatorPanel() {
   const [samples, setSamples] = useState<SampleOption[]>([]);
   const [sampleSlug, setSampleSlug] = useState("");
   const [result, setResult] = useState<ApiEvaluationResponse | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<{ message: string; recovery?: string } | null>(null);
   const [isPending, startTransition] = useTransition();
+  const resultsRegionRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetch("/api/samples")
@@ -91,15 +98,32 @@ export function EvaluatorPanel() {
           setResult(data);
         })
         .catch((err: unknown) => {
-          setError(err instanceof Error ? err.message : "Failed to run evaluation.");
+          if (err instanceof Error && "recoveryGuidance" in err) {
+            const r = err as Error & { recoveryGuidance: string };
+            setError({ message: err.message, recovery: r.recoveryGuidance });
+            return;
+          }
+          setError({
+            message: err instanceof Error ? err.message : "Failed to run evaluation.",
+            recovery: "Try again or pick a smaller artifact."
+          });
         });
     });
   };
 
+  useEffect(() => {
+    if (result && resultsRegionRef.current) {
+      resultsRegionRef.current.focus();
+    }
+  }, [result]);
+
   const handleRunPaste = () => {
     const trimmed = artifact.trim();
     if (!trimmed) {
-      setError("Add or paste an instructional artifact first.");
+      setError({
+        message: "Artifact text is empty.",
+        recovery: "Paste instructional content, upload a .txt/.md file, or run a sample from the library."
+      });
       return;
     }
     runEvaluation({
@@ -113,7 +137,10 @@ export function EvaluatorPanel() {
 
   const handleRunSample = () => {
     if (!sampleSlug) {
-      setError("Choose a sample artifact.");
+      setError({
+        message: "No sample selected.",
+        recovery: "Choose a sample from the dropdown, then run again."
+      });
       return;
     }
     runEvaluation({
@@ -133,11 +160,13 @@ export function EvaluatorPanel() {
       const res = await fetch("/api/uploads", { method: "POST", body: fd });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        const msg =
-          data?.error?.message && data?.error?.recoveryGuidance
-            ? `${data.error.message} — ${data.error.recoveryGuidance}`
-            : "Upload failed.";
-        throw new Error(msg);
+        const e = data?.error as { message?: string; recoveryGuidance?: string } | undefined;
+        if (e?.message && e?.recoveryGuidance) {
+          const err = new Error(e.message) as Error & { recoveryGuidance: string };
+          err.recoveryGuidance = e.recoveryGuidance;
+          throw err;
+        }
+        throw new Error("Upload failed.");
       }
       runEvaluation({
         artifact: {
@@ -147,7 +176,15 @@ export function EvaluatorPanel() {
         }
       });
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Upload failed.");
+      if (e instanceof Error && "recoveryGuidance" in e) {
+        const r = e as Error & { recoveryGuidance: string };
+        setError({ message: e.message, recovery: r.recoveryGuidance });
+      } else {
+        setError({
+          message: e instanceof Error ? e.message : "Upload failed.",
+          recovery: "Use a UTF-8 .txt or .md file under the size limit."
+        });
+      }
     }
   };
 
@@ -229,13 +266,24 @@ export function EvaluatorPanel() {
       </div>
 
       <div className="space-y-4">
-        {error ? <ErrorDisplay message={error} recovery="Fix the issue above, then retry the evaluation." /> : null}
+        {error ? (
+          <ErrorDisplay
+            message={error.message}
+            recovery={error.recovery ?? "Fix the issue above, then retry the evaluation."}
+          />
+        ) : null}
 
         <Card>
           <CardHeader title="Latest result" subtitle="Inspectable structure — no black-box summary (§19)." />
           <CardContent>
             {result ? (
-              <div className="space-y-4">
+              <div
+                ref={resultsRegionRef}
+                tabIndex={-1}
+                className="space-y-4 outline-none ring-offset-2 focus-visible:ring-2 focus-visible:ring-zinc-500"
+                aria-live="polite"
+                aria-atomic="true"
+              >
                 <div className="flex flex-wrap items-center gap-3">
                   <VerdictBadge verdict={result.verdict} />
                   <span className="text-sm text-zinc-400">

@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 46, "column": 0}, "map": {"version":3,"sources":["file:///Users/coreyalejandro/Projects/instructional-integrity-ui/lib/db.ts"],"sourcesContent":["import { PrismaClient } from \"@prisma/client\";\n\ndeclare global {\n  // eslint-disable-next-line no-var\n  var prisma: PrismaClient | undefined;\n}\n\nexport const prisma: PrismaClient =\n  global.prisma ??\n  new PrismaClient({\n    log: [\"error\", \"warn\"]\n  });\n\nif (process.env.NODE_ENV !== \"production\") {\n  global.prisma = prisma;\n}\n\n"],"names":[],"mappings":";;;;AAAA;;AAOO,MAAM,SACX,OAAO,MAAM,IACb,IAAI,sMAAY,CAAC;IACf,KAAK;QAAC;QAAS;KAAO;AACxB;AAEF,wCAA2C;IACzC,OAAO,MAAM,GAAG;AAClB"}},
+    {"offset": {"line": 65, "column": 0}, "map": {"version":3,"sources":["file:///Users/coreyalejandro/Projects/instructional-integrity-ui/app/api/samples/route.ts"],"sourcesContent":["import { NextResponse } from \"next/server\";\nimport { prisma } from \"@/lib/db\";\n\nexport const dynamic = \"force-dynamic\";\n\nexport async function GET() {\n  const samples = await prisma.sampleArtifact.findMany({\n    orderBy: { title: \"asc\" },\n    select: { slug: true, title: true, description: true }\n  });\n  return NextResponse.json(samples);\n}\n"],"names":[],"mappings":";;;;;;AAAA;AACA;;;AAEO,MAAM,UAAU;AAEhB,eAAe;IACpB,MAAM,UAAU,MAAM,qHAAM,CAAC,cAAc,CAAC,QAAQ,CAAC;QACnD,SAAS;YAAE,OAAO;QAAM;QACxB,QAAQ;YAAE,MAAM;YAAM,OAAO;YAAM,aAAa;QAAK;IACvD;IACA,OAAO,gJAAY,CAAC,IAAI,CAAC;AAC3B"}}]
+}

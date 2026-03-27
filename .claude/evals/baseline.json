@@ -1,0 +1,36 @@
+{
+  "captured": "2026-03-26",
+  "tool": "vitest",
+  "command": "npm test",
+  "result": {
+    "test_files": 7,
+    "tests": 15,
+    "passed": 15,
+    "failed": 0,
+    "duration_ms": 193
+  },
+  "test_files": [
+    { "file": "tests/evaluator.test.ts", "status": "PASS" },
+    { "file": "tests/rubric.test.ts", "status": "PASS" },
+    { "file": "tests/artifact-normalizer.test.ts", "status": "PASS" },
+    { "file": "tests/input-validation.test.ts", "status": "PASS" },
+    { "file": "tests/failure-classifier.test.ts", "status": "PASS" },
+    { "file": "tests/determinism.test.ts", "status": "PASS" },
+    { "file": "tests/evaluation-deadline.test.ts", "status": "PASS" }
+  ],
+  "coverage": {
+    "overall_line_threshold": 40,
+    "threshold_met": true,
+    "notable_gaps": [
+      "lib/persistence/* — 0% (Prisma integration, needs DB)",
+      "lib/reporting/* — 0% (export builders not unit tested)",
+      "lib/session/session.ts — 0%",
+      "lib/run-history-service/* — 0%"
+    ]
+  },
+  "e2e_files": [
+    { "file": "tests/e2e/evaluation-flow.spec.ts", "status": "NOT_RUN_IN_BASELINE" },
+    { "file": "tests/e2e/accessibility.spec.ts", "status": "NOT_RUN_IN_BASELINE" },
+    { "file": "tests/e2e/error-states.spec.ts", "status": "NOT_RUN_IN_BASELINE" }
+  ]
+}

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { jsonError } from "@/lib/api/httpError";
 import { ERROR_CODES } from "@/lib/domain/errorTypes";
+import { prisma } from "@/lib/db";
 import { buildJsonExportPayload } from "@/lib/reporting/exportJsonReport";
 import { buildMarkdownExport } from "@/lib/reporting/exportMarkdownReport";
 import { getEvaluationRunForSession } from "@/lib/persistence/getEvaluationRun";
@@ -45,6 +46,13 @@ export async function GET(
       }
     });
     if (setCookieHeader) res.headers.append("Set-Cookie", setCookieHeader);
+    await prisma.exportRecord.create({
+      data: {
+        sessionId,
+        evaluationRunId: id,
+        format: "json"
+      }
+    });
     return res;
   }
 
@@ -56,5 +64,12 @@ export async function GET(
     }
   });
   if (setCookieHeader) res.headers.append("Set-Cookie", setCookieHeader);
+  await prisma.exportRecord.create({
+    data: {
+      sessionId,
+      evaluationRunId: id,
+      format: "markdown"
+    }
+  });
   return res;
 }

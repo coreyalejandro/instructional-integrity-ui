@@ -5,6 +5,7 @@
 
 ## What was just completed
 
+- **Contract checklist §A (core product / UX):** evaluation time budget between rubric dimensions (`EVALUATION_TIMEOUT_MS`), in-process concurrency cap (`MAX_CONCURRENT_EVALUATIONS`, 429 when exceeded), structured API recovery copy (`lib/api/recoveryMessages.ts`), evaluator panel focus + `aria-live` on results, failure-class links to glossary anchors (`lib/glossary/cognitiveSafetyTerms.ts`), remediation strings anchored to excerpts, §20.1 verdict unit tests (warn / needs_human_review / empty), `tests/e2e/error-states.spec.ts`, run-detail axe in `tests/e2e/accessibility.spec.ts`, README §17 #17 → **implemented**.
 - Renamed product surfaces to **Instructional Integrity Studio**; canonical contract at `docs/prompts/ZERO_SHOT_BUILD_CONTRACT__INSTRUCTIONAL_INTEGRITY_STUDIO.md`.
 - New Prisma schema: `Session`, `Artifact`, `EvaluationRun`, `CriterionResult`, `EvidenceExcerpt`, `FailureClassRecord`, `SampleArtifact`, `PendingUpload`, `DeletionLog`.
 - API: `/api/evaluations` (POST/GET), `/api/evaluations/[id]` (GET/DELETE), export, `/api/uploads`, `/api/samples`.
@@ -26,7 +27,7 @@
 
 - `app/api/evaluations/route.ts`, `app/api/evaluations/[id]/route.ts`, `export/route.ts`, `uploads/route.ts`
 - `lib/evaluator/ruleBasedTextEvaluator.ts`, `lib/rubric/defaultRubric.ts`
-- `middleware.ts`, `prisma/schema.prisma`, `data/samples/*.md`
+- `proxy.ts` (Next.js 16 proxy convention; security headers + session cookie), `prisma/schema.prisma`, `data/samples/*.md`
 
 ## Recommended next steps
 
@@ -38,7 +39,7 @@
 ## Known issues
 
 - Line coverage ~44% on `/lib` — documented in `docs/truth-status.md`.
-- `middleware` deprecation warning from Next.js 16 — monitor migration to `proxy`.
+- Playwright `webServer` may need a longer timeout or manual `npm run dev` if `npm run test:e2e` times out waiting for the dev server.
 
 ## Quick reference
 

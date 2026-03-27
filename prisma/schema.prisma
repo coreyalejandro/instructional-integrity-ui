@@ -16,6 +16,7 @@ model Session {
   evaluationRuns EvaluationRun[]
   pendingUploads PendingUpload[]
   deletionLogs   DeletionLog[]
+  exportRecords  ExportRecord[]
 }
 
 model Artifact {
@@ -50,7 +51,8 @@ model EvaluationRun {
   session  Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
   artifact Artifact @relation(fields: [artifactId], references: [id], onDelete: Cascade)
 
-  criteria CriterionResult[]
+  criteria       CriterionResult[]
+  exportRecords  ExportRecord[]
 
   createdAt   DateTime  @default(now())
   completedAt DateTime?
@@ -68,8 +70,9 @@ model CriterionResult {
 
   run EvaluationRun @relation(fields: [evaluationRunId], references: [id], onDelete: Cascade)
 
-  evidence       EvidenceExcerpt[]
-  failureClasses FailureClassRecord[]
+  evidence                 EvidenceExcerpt[]
+  failureClasses           FailureClassRecord[]
+  remediationSuggestions   RemediationSuggestion[]
 }
 
 model EvidenceExcerpt {
@@ -118,6 +121,32 @@ model DeletionLog {
   metadata      Json?
 
   session Session @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+}
+
+/// First-class remediation line item (contract §16). Mirrors criterion copy for query/export.
+model RemediationSuggestion {
+  id                String @id @default(cuid())
+  criterionResultId String
+  suggestionText    String @db.Text
+
+  criterion CriterionResult @relation(fields: [criterionResultId], references: [id], onDelete: Cascade)
+
+  @@index([criterionResultId])
+}
+
+/// Audit of successful report downloads (contract §16 optional).
+model ExportRecord {
+  id              String   @id @default(cuid())
+  sessionId       String
+  evaluationRunId String
+  format          String
+  createdAt       DateTime @default(now())
+
+  session Session       @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  run     EvaluationRun @relation(fields: [evaluationRunId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId])
+  @@index([evaluationRunId])
 }
 
 enum ArtifactSource {

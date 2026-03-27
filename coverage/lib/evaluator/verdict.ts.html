@@ -23,16 +23,16 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">95.23% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>20/21</span>
+                <span class='fraction'>23/23</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">90.9% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>10/11</span>
+                <span class='fraction'>13/13</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">93.75% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>15/16</span>
+                <span class='fraction'>18/18</span>
             </div>
         
             
@@ -97,7 +97,10 @@
 <a name='L32'></a><a href='#L32'>32</a>
 <a name='L33'></a><a href='#L33'>33</a>
 <a name='L34'></a><a href='#L34'>34</a>
-<a name='L35'></a><a href='#L35'>35</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L35'></a><a href='#L35'>35</a>
+<a name='L36'></a><a href='#L36'>36</a>
+<a name='L37'></a><a href='#L37'>37</a>
+<a name='L38'></a><a href='#L38'>38</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -108,26 +111,29 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">73x</span>
-<span class="cline-any cline-yes">49x</span>
-<span class="cline-any cline-yes">38x</span>
-<span class="cline-any cline-yes">73x</span>
-<span class="cline-any cline-yes">9x</span>
-<span class="cline-any cline-yes">9x</span>
-<span class="cline-any cline-yes">9x</span>
+<span class="cline-any cline-yes">16x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">9x</span>
-<span class="cline-any cline-yes">73x</span>
+<span class="cline-any cline-yes">107x</span>
+<span class="cline-any cline-yes">59x</span>
+<span class="cline-any cline-yes">57x</span>
+<span class="cline-any cline-yes">107x</span>
+<span class="cline-any cline-yes">14x</span>
+<span class="cline-any cline-yes">14x</span>
+<span class="cline-any cline-yes">14x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16x</span>
+<span class="cline-any cline-yes">107x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">9x</span>
-<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">16x</span>
+<span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -142,6 +148,9 @@ export function computeVerdictFromCriteria(criteria: CriterionEvaluationResult[]
   verdict: Verdict;
   failureClassSummary: FailureClassId[];
 } {
+  if (criteria.length === 0) {
+    return { verdict: "needs_human_review", failureClassSummary: [] };
+  }
   const insufficient = criteria.filter((c) =&gt; c.evidenceInsufficient).length;
   const anyFail = criteria.some((c) =&gt; c.verdict === "fail");
   const anyWarn = criteria.some((c) =&gt; c.verdict === "warn");
@@ -157,8 +166,8 @@ export function computeVerdictFromCriteria(criteria: CriterionEvaluationResult[]
   if (anyFail) {
     return { verdict: "fail", failureClassSummary: allFailureClasses };
   }
-  <span class="missing-if-branch" title="if path not taken" >I</span>if (insufficient &gt;= 2 || conflict) {
-<span class="cstat-no" title="statement not covered" >    return { verdict: "needs_human_review", failureClassSummary: allFailureClasses };</span>
+  if (insufficient &gt;= 2 || conflict) {
+    return { verdict: "needs_human_review", failureClassSummary: allFailureClasses };
   }
   if (anyWarn) {
     return { verdict: "warn", failureClassSummary: allFailureClasses };
@@ -172,7 +181,7 @@ export function computeVerdictFromCriteria(criteria: CriterionEvaluationResult[]
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-03-26T21:08:19.580Z
+                at 2026-03-27T06:48:37.261Z
             </div>
         <script src="../../prettify.js"></script>
         <script>
