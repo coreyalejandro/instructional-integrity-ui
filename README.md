@@ -56,7 +56,7 @@ Database listens on **localhost:5434** by default (see `docker-compose.yml`).
 ## 8. Implemented features (§17 snapshot)
 
 | # | Feature | Status |
-|---|---------|--------|
+| --- | --------- | -------- |
 | 1 | Paste text/markdown | implemented |
 | 2 | Upload `.txt` / `.md` | implemented |
 | 3 | Sample artifacts | implemented |
