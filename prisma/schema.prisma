@@ -1,3 +1,6 @@
+// Prisma 5: `url` in datasource is required. If the IDE shows a Prisma 7 "move url to prisma.config.ts"
+// warning, enable Prisma: Pin to Prisma 6 + Use Local Prisma Version in .vscode/settings.json.
+
 generator client {
   provider = "prisma-client-js"
 }

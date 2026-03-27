@@ -1,4 +1,4 @@
-<!-- markdownlint-disable MD025 -->
+<!-- markdownlint-disable MD025 MD001 -->
 # File 1: CLAUDE.md (Compact — Always Loaded)
 
 ```markdown
@@ -297,7 +297,7 @@ This Commonwealth aspires to **Lean 4-level formal proof** — but it gets there
 ### Current Tier Status
 
 | Component | Current Tier | Next Tier Target |
-|-----------|-------------|-----------------|
+| --- | --- | --- |
 | V&T Statements | Tier 1 (convention) | Tier 2 (auto-verify claims) |
 | Truth-Status Config | Tier 1 (manual) | Tier 2 (CI validates status matches code) |
 | Build Contracts (BuildLattice) | Tier 1 (schema only) | Tier 2 (OPA + Z3 validation) |
@@ -339,7 +339,7 @@ Companies die from not knowing what they have. They rebuild what already exists.
 ### The Census Check (Enforcement)
 
 | What | How | When |
-|------|-----|------|
+| --- | --- | --- |
 | Component inventory | `pnpm component-inventory:check --strict` | Every CI run, every significant PR |
 | Truth-status sync | Config matches docs, docs match code | Every module status change |
 | Domain mapping | Every project in `projects.ts` has a domain | Every new project added |
@@ -368,6 +368,7 @@ All work under this Constitution is designed for the **most vulnerable user firs
 ### Default User Profile
 
 The default user is a neurodivergent adult with:
+
 - **Autism** — Needs explicit, unambiguous instructions. No implied steps. No "you probably know this" shortcuts.
 - **Bipolar I Disorder with psychotic features** — Prone to manic episodes that can be triggered by cognitive overload, ambiguity, or spatial reasoning demands. Instructions must be paced, recoverable, and never create urgency.
 - **ADHD** — Working memory is limited. Never assume the user remembers what was said 3 steps ago. Restate context at decision points.
@@ -391,7 +392,7 @@ The default user is a neurodivergent adult with:
 
 This is not a special mode. This is not an accessibility toggle. This IS the default.
 
-### Operational Extension
+### Operational extension (Default User and Article VI)
 
 The Default User defines WHO the Commonwealth is designed for. **Article VI (Audience Law)** extends this by defining all user classes the system serves, their permissions, their surfaces, and how the system must speak to each of them. The Default User is the philosophy. Article VI is the operations.
 
@@ -445,7 +446,7 @@ This is non-negotiable. Every response ends with a V&T Statement. No exceptions.
 ## ARTICLE IV — Separation of Powers (Agent Republic)
 
 | Agent | Can Do (Without Approval) | Cannot Do (Needs Human OK) |
-|-------|---------------------------|----------------------------|
+| --- | --- | --- |
 | **Planner** | Write todo.md, break down tasks, draft specs | Change architectural decisions, modify ToC&A anchors |
 | **Builder** | Write code, write tests, create files | Deploy to production, modify DB schema, change auth |
 | **Sentinel** | Run safety checks, raise STOP signals, write audit logs | Override other agents, modify its own rules, access PII |
@@ -454,6 +455,7 @@ This is non-negotiable. Every response ends with a V&T Statement. No exceptions.
 | **Data Scientist** | Update metrics, generate impact reports, sync KB | Redefine ToC&A nodes, change success metrics without review |
 
 ### Orchestration Rules
+
 - Use subagents liberally to keep main context clean
 - One track per subagent for focused execution
 - For complex problems, throw more compute at it via parallel agents
@@ -1284,4 +1286,3 @@ repo-root/
 │       ├── truth-maintenance-contract.md   # Article VIII — full text
 │       └── release-gates.md           # SOP-014 — Governance Release Gates
 ```
-

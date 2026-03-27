@@ -1,0 +1,4 @@
+{
+  "prisma.useLocalPrismaVersion": true,
+  "prisma.pinToPrisma6": true
+}
