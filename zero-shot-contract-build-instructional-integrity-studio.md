@@ -155,7 +155,7 @@ Never claim validated evaluator accuracy unless such validation exists and is do
 Separate the following concerns into distinct modules. Each concern maps to a required architectural module in §12.
 
 | Concern | Required Module |
-|---|---|
+| --- | --- |
 | artifact intake | `artifact-intake` |
 | artifact normalization | `artifact-normalizer` |
 | rubric evaluation | `evaluation-engine` + `rubric-registry` |
@@ -212,7 +212,7 @@ The builder must narrow the first implementation to one primary evaluation targe
 
 ### Required MVP evaluation object
 
-**AI-generated explanation artifacts in text or markdown form**
+#### AI-generated explanation artifacts in text or markdown form
 
 This means the MVP must support evaluation of:
 
@@ -229,7 +229,7 @@ PDF, slide deck, image, transcript, and multimodal artifacts may be added later 
 All artifact intake must enforce:
 
 | Constraint | Rule |
-|---|---|
+| --- | --- |
 | **Max paste length** | 100,000 characters. Reject with clear error above this limit. |
 | **Max upload file size** | 5 MB. Reject with clear error above this limit. |
 | **Allowed MIME types** | `text/plain`, `text/markdown`, `text/x-markdown`. Reject all others with explicit error naming the unsupported type. |
@@ -252,7 +252,7 @@ Per Article VI (Audience Law), every surface must declare its target user class.
 A human testing whether instructional artifacts satisfy cognitive safety requirements.
 
 | Attribute | Definition |
-|---|---|
+| --- | --- |
 | **Goals** | Submit instructional artifacts; run evaluations; inspect criterion-level results and evidence; identify failure classes; review remediation guidance; export evidence-backed reports; review evaluation history |
 | **Can** | Paste or upload artifacts; initiate evaluations; inspect all scoring, evidence, and failure data; export reports; view and compare historical runs |
 | **Cannot** | Edit evaluation results retroactively; suppress failure classes; mark artifacts as safe without evaluation evidence |
@@ -264,7 +264,7 @@ A human testing whether instructional artifacts satisfy cognitive safety require
 A downstream learner or content consumer who may be affected by artifacts evaluated in this system. This user does not interact with the product directly in MVP, but the system's outputs — reports, failure labels, remediation guidance — must be written so that they could be shown to this user without causing harm.
 
 | Attribute | Definition |
-|---|---|
+| --- | --- |
 | **Goals** | Understand why an artifact was flagged; interpret remediation guidance; trust that the evaluation is grounded |
 | **Copy Rules** | Plain language, low-ambiguity, no jargon in remediation text without definition, cognitively safe pacing |
 
@@ -273,7 +273,7 @@ A downstream learner or content consumer who may be affected by artifacts evalua
 A human reviewing Instructional Integrity Studio as part of TLC governance.
 
 | Attribute | Definition |
-|---|---|
+| --- | --- |
 | **Goals** | Inspect truth status; review system state; verify compliance with TLC governance |
 | **Primary Surfaces** | Homepage/doctrine surface (§10.1), truth-status file, README |
 | **Copy Mode** | Concise, operational, risk-aware |
@@ -308,7 +308,7 @@ Mock-only evaluator behavior is not sufficient for the MVP claim.
 At each step, the following failure states must be handled explicitly per Article VII:
 
 | Step | Possible Failure | Required Response | Severity |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | 1. Submit | Empty input, oversized input, wrong MIME type | Reject with specific guidance naming the constraint violated | S1 |
 | 2. Validate | Encoding failure, embedded unsafe content detected | Reject or sanitize with user notification; preserve raw input for audit | S1–S2 |
 | 3. Normalize | Unparseable structure, degenerate content (e.g., single character) | Return normalization failure with specific cause; do not proceed to evaluation | S2 |
@@ -340,7 +340,7 @@ The MVP must include explicit cognitive-safety failure classes as first-class ou
 Minimum required classes:
 
 | Class ID | Definition |
-|---|---|
+| --- | --- |
 | `premature_conclusion` | Conclusion presented before sufficient justification or evidence |
 | `missing_prerequisite_scaffolding` | Concept introduced without required prior knowledge |
 | `terminology_jump` | Term used before it has been defined or grounded |
@@ -431,7 +431,7 @@ Testing requirement: Run axe-core or Lighthouse accessibility audit on all four 
 
 The four surfaces must be organized as follows:
 
-```
+```text
 ┌──────────────────────────────────────────┐
 │  Global Navigation Bar                    │
 │  [Home/Doctrine] [Evaluate] [History]     │
@@ -462,7 +462,7 @@ The rubric must not be generic.
 Minimum required rubric dimensions:
 
 | Dimension ID | Name |
-|---|---|
+| --- | --- |
 | `seq_integrity` | Sequencing Integrity |
 | `prereq_visibility` | Prerequisite Visibility |
 | `term_grounding` | Terminology Grounding |
@@ -492,7 +492,7 @@ Each rubric dimension must have:
 Use the following default stack unless a stronger implementation reason is documented in an ADR (§28.2):
 
 | Concern | Technology |
-|---|---|
+| --- | --- |
 | **Framework** | Next.js App Router |
 | **Language** | TypeScript (strict mode) |
 | **UI** | ShadCN UI |
@@ -515,7 +515,7 @@ Use the following default stack unless a stronger implementation reason is docum
 The project must include:
 
 | File | Purpose |
-|---|---|
+| --- | --- |
 | `.env.example` | Documented template with all required environment variables, no secrets |
 | `.env.local` | Gitignored local override |
 | `docker-compose.yml` | Local PostgreSQL instance + optional app container |
@@ -548,7 +548,7 @@ CORS must be configured to reject cross-origin API requests unless explicitly al
 ### 13.1 Required Modules
 
 | Module | Concern (§5.2) | Description |
-|---|---|---|
+| --- | --- | --- |
 | `artifact-intake` | artifact intake | Accepts paste and upload, enforces §6.1 constraints |
 | `artifact-normalizer` | artifact normalization | Converts raw input to internal evaluation object |
 | `rubric-registry` | rubric evaluation | Stores and serves rubric dimension definitions |
@@ -563,7 +563,7 @@ CORS must be configured to reject cross-origin API requests unless explicitly al
 ### 13.2  Data Retention and Deletion
 
 | Rule | Specification |
-|---|---|
+| --- | --- |
 | **Default retention** | Evaluation runs are retained indefinitely in MVP |
 | **User-initiated deletion** | Users must be able to delete individual evaluation runs and their associated data |
 | **Cascade behavior** | Deleting an evaluation run must cascade to: CriterionResult, EvidenceExcerpt, FailureClass records, RemediationSuggestion, and ExportRecord |
@@ -604,7 +604,7 @@ This is an architectural requirement, not a feature requirement. The extension i
 ### 14.1 Endpoints
 
 | Method | Path | Purpose |
-|---|---|---|
+| --- | --- | --- |
 | `POST` | `/api/evaluations` | Submit artifact and run evaluation |
 | `GET` | `/api/evaluations` | List evaluation runs |
 | `GET` | `/api/evaluations/[id]` | Get evaluation run detail |
@@ -796,7 +796,7 @@ CHANGELOG.md
 At minimum, persist:
 
 | Entity | Key Relationships |
-|---|---|
+| --- | --- |
 | `Artifact` | Has many `EvaluationRun` |
 | `EvaluationRun` | Belongs to `Artifact`; has many `CriterionResult` |
 | `CriterionResult` | Belongs to `EvaluationRun`; has many `EvidenceExcerpt`; has many `FailureClassRecord` |
@@ -812,7 +812,7 @@ The schema must support one artifact having many evaluation runs over time.
 ### 16.1  Migration and Seed Strategy
 
 | Requirement | Rule |
-|---|---|
+| --- | --- |
 | **Migrations** | Use Prisma Migrate. All schema changes must have a migration file. No manual SQL in production. |
 | **Seed script** | `prisma/seed.ts` must populate sample artifacts from `/data/samples/`. |
 | **Dev reset** | `pnpm db:reset` must drop, migrate, and seed in one command. |
@@ -825,7 +825,7 @@ The schema must support one artifact having many evaluation runs over time.
 The MVP must include all of the following as working features:
 
 | # | Feature | Acceptance Signal |
-|---|---|---|
+| --- | --- | --- |
 | 1 | Paste text/markdown artifact into evaluator | Text appears in evaluation object |
 | 2 | Upload `.txt` and `.md` artifact files | File parsed and normalized |
 | 3 | Select from preloaded sample artifacts | Sample loads into evaluator |
@@ -898,7 +898,7 @@ The evaluator must not return black-box summary text without exposing the scored
 ### 19.1  Timeout and Resource Constraints
 
 | Constraint | Limit |
-|---|---|
+| --- | --- |
 | **Evaluation timeout** | 30 seconds (configurable via `EVALUATION_TIMEOUT_MS`) |
 | **Max concurrent evaluations** | 5 per instance (configurable) |
 | **Timeout behavior** | Mark evaluation as `incomplete`; persist partial results; return S2 error to user |
@@ -921,7 +921,7 @@ These must be grounded in explicit scoring and failure logic.
 The verdict must be derived deterministically from criterion scores:
 
 | Condition | Verdict |
-|---|---|
+| --- | --- |
 | All criteria pass | `pass` |
 | Any criterion warns, none fail | `warn` |
 | Any criterion fails | `fail` |
@@ -964,7 +964,7 @@ Per Article VI (Audience Law), remediation text must be written so that it could
 The README must contain:
 
 | # | Section | Content |
-|---|---|---|
+| --- | --- | --- |
 | 1 | Product name and domain | Instructional Integrity Studio — Cognitive Safety |
 | 2 | What cognitive safety is | 2–3 sentence definition |
 | 3 | What problem the product solves | Why correct content can be cognitively unsafe |
@@ -1020,7 +1020,7 @@ Do not exaggerate implementation state.
 ### 23.1  Truth Maintenance Rules (per Article VIII)
 
 | Rule | Specification |
-|---|---|
+| --- | --- |
 | **Owner** | The builder until handoff; thereafter the Constitutional Operator |
 | **Update trigger** | Every PR that changes feature status, every release, every dependency change that affects evaluator behavior |
 | **Freshness window** | 7 days during active development; 30 days in maintenance mode |
@@ -1047,7 +1047,7 @@ Before any release or PR that changes feature status, the builder must verify:
 ### 24.1 Unit Tests
 
 | Test Subject | Required Cases |
-|---|---|
+| --- | --- |
 | Artifact normalization | Valid text, valid markdown, empty input, oversized input, non-UTF-8, single character |
 | Input validation | Every constraint in §6.1 with both passing and failing cases |
 | Rubric scoring logic | Each dimension scored correctly; edge cases for partial matches |
@@ -1059,7 +1059,7 @@ Before any release or PR that changes feature status, the builder must verify:
 ### 24.2 Integration Tests
 
 | Test Subject | Required Cases |
-|---|---|
+| --- | --- |
 | Create evaluation run | Full flow from API request to persisted record |
 | Persist criterion results | All criterion data, evidence, and failure classes stored |
 | Retrieve evaluation history | List endpoint returns correct records |
@@ -1071,7 +1071,7 @@ Before any release or PR that changes feature status, the builder must verify:
 ### 24.3 E2E Tests
 
 | Test Subject | Required Cases |
-|---|---|
+| --- | --- |
 | Paste → evaluate → persist → open detail | Full happy-path loop in browser |
 | Upload → evaluate → persist → export | Upload flow through to export download |
 | Sample artifact → evaluate | Preloaded sample triggers successful evaluation |
@@ -1081,7 +1081,7 @@ Before any release or PR that changes feature status, the builder must verify:
 ### 24.4  Test Quality Standards
 
 | Standard | Requirement |
-|---|---|
+| --- | --- |
 | **Coverage threshold** | 80% line coverage for `/lib` directory |
 | **Negative test ratio** | At least 30% of unit tests must be negative/boundary cases |
 | **CI requirement** | All tests must run in CI on every PR |
@@ -1096,7 +1096,7 @@ No MVP completion claim is allowed without passing tests.
 The builder must explicitly perform these maturity upgrades:
 
 | # | Move | Verification |
-|---|---|---|
+| --- | --- | --- |
 | 1 | Remove contradictory status language from existing docs | Grep for conflicting claims; none found |
 | 2 | Replace mock ambiguity with one real end-to-end evaluator path | E2E test passes |
 | 3 | Make upload real for text/markdown | Upload test passes with real files |
@@ -1107,9 +1107,9 @@ The builder must explicitly perform these maturity upgrades:
 | 8 | Add build contract to repo | File exists at specified path |
 | 9 | Link build contract in README | Link present and working |
 | 10 | Present the repo as a real Cognitive Safety subsystem inside TLC | README and homepage communicate this clearly |
-| 11 |  Handle all error states in §8.1 | Error state E2E tests pass |
-| 12 |  Seed sample artifacts | Sample artifacts appear in evaluator workspace |
-| 13 |  Pass all four Governance Release Gates (SOP-014) | Gate checklist completed |
+| 11 | Handle all error states in §8.1 | Error state E2E tests pass |
+| 12 | Seed sample artifacts | Sample artifacts appear in evaluator workspace |
+| 13 | Pass all four Governance Release Gates (SOP-014) | Gate checklist completed |
 
 ---
 
@@ -1221,7 +1221,7 @@ Template must include:
 Create `docs/security.md` containing a lightweight threat analysis covering:
 
 | Surface | Threats | Mitigations |
-|---|---|---|
+| --- | --- | --- |
 | Paste input | XSS, injection, oversized payload | §6.1 sanitization, §12.2 CSP, size limits |
 | File upload | Malicious files, path traversal, MIME spoofing | §6.1 MIME validation, filename sanitization, server-side only |
 | API endpoints | CSRF, unauthorized access, abuse | Security headers, CORS, rate limiting consideration |
@@ -1256,7 +1256,7 @@ Implementation: a glossary component (`cognitive-safety-glossary.tsx`) accessibl
 The MVP uses **anonymous session-based identity**.
 
 | Rule | Specification |
-|---|---|
+| --- | --- |
 | **Session** | Browser session via cookie; no login required |
 | **Identity** | Anonymous session ID; no PII collected |
 | **Scope** | Each session sees only its own evaluation runs |
@@ -1318,14 +1318,12 @@ Do not ship without passing all four Governance Release Gates.
 The first successful version is not "big."
 The first successful version is **credible, governed, and honest about what it is.**
 
-```
-
 ---
 
 ## Change Log: v1.0 → v2.0
 
 | Section | Change Type | What Changed | Source Recommendation |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | Header | Enhanced | Added prior version reference, amendment authority, TLC binding statement | S-H5 |
 | §4 | Enhanced | Added governing TLC Articles reference | Gap closure |
 | §5.2 | Enhanced | Mapped separation concerns to architectural modules 1:1 | S-E7 |
@@ -1379,7 +1377,7 @@ The first successful version is **credible, governed, and honest about what it i
 ### Recommendations Addressed
 
 | Category | Total Identified | Addressed in v2.0 | Remaining |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | **Essential (S-E)** | 10 | 10 | 0 |
 | **Table Stakes (S-T)** | 12 | 12 | 0 |
 | **High Value-Added (S-H)** | 10 | 9 | 1 |

@@ -96,16 +96,19 @@ export async function POST(request: NextRequest) {
   const { sessionId, setCookieHeader } = await resolveSession(request);
   const started = Date.now();
 
-  if (!concurrencyLimiter.tryEnter()) {
-    return jsonError(
-      ERROR_CODES.CONCURRENT_LIMIT,
-      "Too many evaluations are running on this instance.",
-      "Wait a few seconds and retry, or open History to confirm whether a run completed.",
-      429
-    );
-  }
-
+  /** Holds a concurrency slot only after tryEnter() succeeds; finally must leave() only when true. */
+  let acquiredSlot = false;
   try {
+    if (!concurrencyLimiter.tryEnter()) {
+      return jsonError(
+        ERROR_CODES.CONCURRENT_LIMIT,
+        "Too many evaluations are running on this instance.",
+        "Wait a few seconds and retry, or open History to confirm whether a run completed.",
+        429
+      );
+    }
+    acquiredSlot = true;
+
     const json = await request.json();
     const parsed = postEvaluationBodySchema.safeParse(json);
     if (!parsed.success) {
@@ -178,7 +181,9 @@ export async function POST(request: NextRequest) {
       500
     );
   } finally {
-    concurrencyLimiter.leave();
+    if (acquiredSlot) {
+      concurrencyLimiter.leave();
+    }
   }
 }
 

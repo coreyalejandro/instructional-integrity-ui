@@ -5,6 +5,7 @@
 
 ## What was just completed
 
+- **Concurrency / env parsing:** `POST /api/evaluations` uses `acquiredSlot` so `concurrencyLimiter.leave()` runs only after a successful `tryEnter()` (safe if `tryEnter` stays inside `try`/`finally`). `getMaxConcurrentEvaluations()` strips double quotes from env like `getEvaluationTimeoutMs()`. Test added for quoted values in `tests/concurrency-schemas.test.ts`.
 - **Contract checklist §A (core product / UX):** evaluation time budget between rubric dimensions (`EVALUATION_TIMEOUT_MS`), in-process concurrency cap (`MAX_CONCURRENT_EVALUATIONS`, 429 when exceeded), structured API recovery copy (`lib/api/recoveryMessages.ts`), evaluator panel focus + `aria-live` on results, failure-class links to glossary anchors (`lib/glossary/cognitiveSafetyTerms.ts`), remediation strings anchored to excerpts, §20.1 verdict unit tests (warn / needs_human_review / empty), `tests/e2e/error-states.spec.ts`, run-detail axe in `tests/e2e/accessibility.spec.ts`, README §17 #17 → **implemented**.
 - Renamed product surfaces to **Instructional Integrity Studio**; canonical contract at `docs/prompts/ZERO_SHOT_BUILD_CONTRACT__INSTRUCTIONAL_INTEGRITY_STUDIO.md`.
 - New Prisma schema: `Session`, `Artifact`, `EvaluationRun`, `CriterionResult`, `EvidenceExcerpt`, `FailureClassRecord`, `SampleArtifact`, `PendingUpload`, `DeletionLog`.

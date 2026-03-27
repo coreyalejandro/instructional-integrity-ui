@@ -1,3 +1,4 @@
+<!-- markdownlint-disable MD025 -->
 # File 1: CLAUDE.md (Compact — Always Loaded)
 
 ```markdown
@@ -160,13 +161,12 @@ The complete unabridged Constitution is preserved at: `docs/governance/CONSTITUT
 
 ## V&T STATEMENT (Required Every Response — No Exceptions)
 
-```
+```text
 V&T Statement
 Exists: [what is real and verifiable right now]
 Non-existent: [what is planned/specified but not yet built]
 Unverified: [what hasn't been tested/confirmed]
 Functional status: [overall readiness assessment]
-```
 ```
 
 ---
@@ -246,7 +246,7 @@ This Commonwealth aspires to **Lean 4-level formal proof** — but it gets there
 
 ### The Assurance Ladder
 
-```
+```text
 ┌─────────────────────────────────────────────────────────┐
 │                                                          │
 │  TIER 3: FORMAL PROOF (Aspiration)                      │
@@ -287,6 +287,7 @@ This Commonwealth aspires to **Lean 4-level formal proof** — but it gets there
 │  └────────────────────────────────────────────────────┘ │
 │                                                          │
 └─────────────────────────────────────────────────────────┘
+
 ```
 
 ### The Invariant
@@ -406,7 +407,7 @@ Every user and agent interaction has fundamental rights. These cannot be overrid
 4. **Right to Clarity** — Every decision must be explainable in plain language. If it can't be explained simply, it isn't understood
 5. **Right to Truth** — No claim without evidence. No status inflation. Article VIII (Truth Maintenance Law) governs how this right is preserved over time. The V&T Statement enforces this right on every turn:
 
-```
+```text
 V&T Statement
 Exists: [what is real and verifiable right now]
 Non-existent: [what is planned/specified but not yet built]
@@ -521,7 +522,6 @@ This is non-negotiable. Every response ends with a V&T Statement. No exceptions.
 - Format: "I recommend **X** because [reason]"
 - Never present bare option lists without a clear recommendation
 - Plain language first. Technical depth on request. Respect Article I.
-```
 
 ---
 
@@ -1104,7 +1104,7 @@ No override without Constitutional Operator approval and documented rationale.
 
 When all gates pass, record:
 
-```
+```text
 Release Gate Record
 Date:
 Feature/Subsystem:
@@ -1115,7 +1115,6 @@ Gate 4 (Constitutional): PASS / BLOCK
 Overall: RELEASE / BLOCK
 Reviewer:
 Notes:
-```
 ```
 
 ---
@@ -1274,7 +1273,7 @@ COUNT what you have → KNOW what's redundant, missing, or broken → BUILD only
 
 # Complete File Tree
 
-```
+```text
 repo-root/
 ├── CLAUDE.md                          # Compact (~2,500 tokens) — loaded every turn
 ├── docs/
@@ -1283,4 +1282,6 @@ repo-root/
 │       ├── audience-contract.md       # Article VI — full text
 │       ├── failure-operations-contract.md  # Article VII — full text
 │       ├── truth-maintenance-contract.md   # Article VIII — full text
-│       ├──
+│       └── release-gates.md           # SOP-014 — Governance Release Gates
+```
+

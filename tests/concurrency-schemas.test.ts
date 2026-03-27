@@ -104,6 +104,11 @@ describe("getMaxConcurrentEvaluations", () => {
     expect(getMaxConcurrentEvaluations()).toBe(10);
   });
 
+  it("parses when env value is wrapped in double quotes (matches .env.example style)", () => {
+    process.env.MAX_CONCURRENT_EVALUATIONS = '"12"';
+    expect(getMaxConcurrentEvaluations()).toBe(12);
+  });
+
   it("caps at 100", () => {
     process.env.MAX_CONCURRENT_EVALUATIONS = "200";
     expect(getMaxConcurrentEvaluations()).toBe(100);

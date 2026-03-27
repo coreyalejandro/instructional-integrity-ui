@@ -25,6 +25,7 @@ export class EvaluationConcurrencyLimiter {
 
 export function getMaxConcurrentEvaluations(): number {
   const raw = process.env.MAX_CONCURRENT_EVALUATIONS;
-  const n = raw !== undefined ? Number.parseInt(raw, 10) : 5;
+  const n =
+    raw !== undefined ? Number.parseInt(String(raw).replace(/"/g, ""), 10) : 5;
   return Number.isFinite(n) && n >= 1 ? Math.min(n, 100) : 5;
 }
