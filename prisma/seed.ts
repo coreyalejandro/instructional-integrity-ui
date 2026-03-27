@@ -1,9 +1,18 @@
+import "dotenv/config";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { PrismaClient } from "@prisma/client";
+import { PrismaPg } from "@prisma/adapter-pg";
+import { PrismaClient } from "../generated/prisma/client";
 
-const prisma = new PrismaClient();
+const connectionString = process.env.DATABASE_URL;
+if (!connectionString) {
+  throw new Error("DATABASE_URL is not set");
+}
+
+const prisma = new PrismaClient({
+  adapter: new PrismaPg({ connectionString })
+});
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const samplesDir = path.join(__dirname, "..", "data", "samples");

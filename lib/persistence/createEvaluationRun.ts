@@ -1,4 +1,4 @@
-import type { ArtifactSource as PrismaArtifactSource } from "@prisma/client";
+import type { ArtifactSource as PrismaArtifactSource } from "@/generated/prisma/client";
 import { prisma } from "@/lib/db";
 import type { EvaluationResultPayload } from "@/lib/domain/evaluationTypes";
 import { getLogger } from "@/lib/logging/logger";

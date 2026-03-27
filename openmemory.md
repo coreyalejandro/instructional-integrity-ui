@@ -11,7 +11,7 @@
 - **UI:** `app/page.tsx` (doctrine), `app/evaluate/page.tsx`, `app/runs/page.tsx`, `app/runs/[id]/page.tsx`; `components/header.tsx` nav Home / Evaluate / History.
 - **API:** `app/api/evaluations/*`, `app/api/uploads`, `app/api/samples`.
 - **Core:** `lib/evaluator/ruleBasedTextEvaluator.ts`, `lib/rubric/defaultRubric.ts` (10 dimensions), `lib/persistence/*`, `lib/session/session.ts` (cookie `iis_session`).
-- **Data:** PostgreSQL + Prisma; local `docker compose` port **5434**.
+- **Data:** PostgreSQL + Prisma ORM 7 (`prisma.config.ts` for migrate URL; `generated/prisma` client; `@prisma/adapter-pg` + `PrismaClient({ adapter })` in `lib/db.ts`); local `docker compose` port **5434**.
 
 ## User defined namespaces
 

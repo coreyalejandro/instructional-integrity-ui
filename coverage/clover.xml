@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1774597920796" clover="3.2.0">
-  <project timestamp="1774597920797" name="All files">
-    <metrics statements="362" coveredstatements="290" conditionals="269" coveredconditionals="201" methods="76" coveredmethods="61" elements="707" coveredelements="552" complexity="0" loc="362" ncloc="362" packages="15" files="37" classes="37"/>
+<coverage generated="1774612938982" clover="3.2.0">
+  <project timestamp="1774612938982" name="All files">
+    <metrics statements="366" coveredstatements="290" conditionals="271" coveredconditionals="201" methods="76" coveredmethods="61" elements="713" coveredelements="552" complexity="0" loc="366" ncloc="366" packages="15" files="37" classes="37"/>
     <package name="lib">
-      <metrics statements="19" coveredstatements="10" conditionals="14" coveredconditionals="5" methods="3" coveredmethods="1"/>
+      <metrics statements="23" coveredstatements="10" conditionals="16" coveredconditionals="5" methods="3" coveredmethods="1"/>
       <file name="data.ts" path="/Users/coreyalejandro/Projects/instructional-integrity-ui/lib/data.ts">
         <metrics statements="4" coveredstatements="4" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
         <line num="1" count="1" type="stmt"/>
@@ -12,10 +12,14 @@
         <line num="90" count="1" type="stmt"/>
       </file>
       <file name="db.ts" path="/Users/coreyalejandro/Projects/instructional-integrity-ui/lib/db.ts">
-        <metrics statements="3" coveredstatements="0" conditionals="4" coveredconditionals="0" methods="0" coveredmethods="0"/>
-        <line num="9" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="14" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="15" count="0" type="stmt"/>
+        <metrics statements="7" coveredstatements="0" conditionals="6" coveredconditionals="0" methods="0" coveredmethods="0"/>
+        <line num="9" count="0" type="stmt"/>
+        <line num="10" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="11" count="0" type="stmt"/>
+        <line num="14" count="0" type="stmt"/>
+        <line num="17" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="23" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="24" count="0" type="stmt"/>
       </file>
       <file name="runs.ts" path="/Users/coreyalejandro/Projects/instructional-integrity-ui/lib/runs.ts">
         <metrics statements="6" coveredstatements="0" conditionals="5" coveredconditionals="0" methods="2" coveredmethods="0"/>

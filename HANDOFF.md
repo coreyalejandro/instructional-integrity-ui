@@ -5,6 +5,7 @@
 
 ## What was just completed
 
+- **Prisma ORM 7:** `prisma.config.ts` holds `DATABASE_URL` for CLI/migrate; `prisma/schema.prisma` datasource has `provider` only; generator `prisma-client` outputs to `generated/prisma` (gitignored; `postinstall` + build run `prisma generate`). `lib/db.ts` uses `PrismaClient({ adapter: new PrismaPg({ connectionString }) })`. Seed in `prisma/seed.ts` matches. Removed `prisma.pinToPrisma6` from editor settings.
 - **Concurrency / env parsing:** `POST /api/evaluations` uses `acquiredSlot` so `concurrencyLimiter.leave()` runs only after a successful `tryEnter()` (safe if `tryEnter` stays inside `try`/`finally`). `getMaxConcurrentEvaluations()` strips double quotes from env like `getEvaluationTimeoutMs()`. Test added for quoted values in `tests/concurrency-schemas.test.ts`.
 - **Contract checklist §A (core product / UX):** evaluation time budget between rubric dimensions (`EVALUATION_TIMEOUT_MS`), in-process concurrency cap (`MAX_CONCURRENT_EVALUATIONS`, 429 when exceeded), structured API recovery copy (`lib/api/recoveryMessages.ts`), evaluator panel focus + `aria-live` on results, failure-class links to glossary anchors (`lib/glossary/cognitiveSafetyTerms.ts`), remediation strings anchored to excerpts, §20.1 verdict unit tests (warn / needs_human_review / empty), `tests/e2e/error-states.spec.ts`, run-detail axe in `tests/e2e/accessibility.spec.ts`, README §17 #17 → **implemented**.
 - Renamed product surfaces to **Instructional Integrity Studio**; canonical contract at `docs/prompts/ZERO_SHOT_BUILD_CONTRACT__INSTRUCTIONAL_INTEGRITY_STUDIO.md`.
@@ -28,7 +29,7 @@
 
 - `app/api/evaluations/route.ts`, `app/api/evaluations/[id]/route.ts`, `export/route.ts`, `uploads/route.ts`
 - `lib/evaluator/ruleBasedTextEvaluator.ts`, `lib/rubric/defaultRubric.ts`
-- `proxy.ts` (Next.js 16 proxy convention; security headers + session cookie), `prisma/schema.prisma`, `data/samples/*.md`
+- `proxy.ts` (Next.js 16 proxy convention; security headers + session cookie), `prisma/schema.prisma`, `prisma.config.ts`, `lib/db.ts`, `data/samples/*.md`
 
 ## Recommended next steps
 
